@@ -1,7 +1,8 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
+import { createError } from "../utils/error.js";
 
-const signUp = async (req, res) => {
+const signUp = async (req, res, next) => {
   const { username, email, password } = req.body;
 
   if (
@@ -12,10 +13,9 @@ const signUp = async (req, res) => {
     email === "" ||
     password === ""
   ) {
-    return res.status(400).json({ message: "All fields are required" });
+    return next(createError(400, "All fields are required"));
   }
-
-  const hashedPassword = bcryptjs.hashSync(password, 10);
+  const hashedPassword = await bcryptjs.hash(password, 10);
 
   const newUser = new User({
     username,
@@ -27,13 +27,7 @@ const signUp = async (req, res) => {
     await newUser.save();
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    // Explicitly check for duplicate email
-    if (error.code === 11000) {
-      return res.status(409).json({
-        message: "Email already exists",
-      });
-    }
-    res.status(500).json({ message: "Error creating user", error });
+    next(error);
   }
 };
 
