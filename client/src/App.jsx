@@ -5,7 +5,7 @@ import SignUp from "./pages/SignUp.jsx";
 import SignIn from "./pages/SignIn.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Projects from "./pages/Projects.jsx";
-import Header from "./components/Header.jsx";
+import Header from "./components/common/Header.jsx";
 function App() {
   return (
     <BrowserRouter>
