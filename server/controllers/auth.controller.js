@@ -27,6 +27,11 @@ const signUp = async (req, res, next) => {
     await newUser.save();
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
+    // MongoDB duplicate key error
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyValue)[0];
+      return next(createError(409, `${field} already exists`));
+    }
     next(error);
   }
 };

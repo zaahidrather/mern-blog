@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { AiOutlineMenu, AiOutlineSearch } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
-import { FaMoon } from "react-icons/fa";
+import { Menu, Moon, Search } from "lucide-react";
 
 export default function Header() {
   const { pathname } = useLocation();
@@ -36,7 +35,7 @@ export default function Header() {
         <form>
           <div className="relative hidden lg:inline-block">
             <Input type="text" placeholder="Search..." className="pr-9" />
-            <AiOutlineSearch className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           </div>
         </form>
 
@@ -45,7 +44,7 @@ export default function Header() {
           size="icon"
           className="lg:hidden border h-10 w-12 cursor-pointer rounded-full"
         >
-          <AiOutlineSearch className="h-4 w-4" />
+          <Search className="h-4 w-4" />
         </Button>
 
         <div className="flex gap-2 md:order-2 items-center">
@@ -54,7 +53,7 @@ export default function Header() {
             className="md:flex rounded-full items-center justify-center w-12 h-10 cursor-pointer border bg-white text-black hidden"
             color="gray"
           >
-            <FaMoon />
+            <Moon />
           </button>
 
           <Link to="/sign-in">
@@ -69,10 +68,7 @@ export default function Header() {
           {/* Hamburger Icon Mobile */}
           <div>
             <button className="md:hidden cursor-pointer border h-10 w-10 flex justify-center items-center">
-              <AiOutlineMenu
-                onClick={() => setIsOpen((v) => !v)}
-                className="h-6 w-6"
-              />
+              <Menu onClick={() => setIsOpen((v) => !v)} className="h-6 w-6" />
             </button>
           </div>
         </div>
