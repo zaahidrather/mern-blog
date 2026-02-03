@@ -2,21 +2,24 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import userReducer from "./user/userSlice.js";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
+import themeReducer from './theme/themeSlice'
 
-// 1. NESTED CONFIG: Put this here to control the "user" slice specifically
-const userPersistConfig = {
-  key: "user",
+const rootPersistConfig = {
+  key: 'root',
   storage,
-  blacklist: ["error", "loading"],
+  // This tells Redux Persist to save 'user' and 'theme'
+  whitelist: ['user', 'theme']
 };
 
-// 2. WRAP THE REDUCER: Use persistReducer on the userReducer specifically
 const rootReducer = combineReducers({
-  user: persistReducer(userPersistConfig, userReducer),
+  user: userReducer, // We will handle its specific blacklist inside the slice or via a nested persist if needed
+  theme: themeReducer,
 });
 
+const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
+
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),
 });

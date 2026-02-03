@@ -2,16 +2,21 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Menu, Moon, Search } from "lucide-react";
+import { Menu, Moon, Search, Sun } from "lucide-react";
 import { useSelector } from "react-redux";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { themeToggle } from "@/redux/theme/themeSlice";
+import { useDispatch } from "react-redux";
 
 export default function Header() {
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.currentUser);
+  const theme = useSelector((state) => state.theme.mode);
 
+  // console.log('theme mode : ', theme);
   // console.log('currentUser', currentUser);
 
   const linkClasses = (href) =>
@@ -21,7 +26,7 @@ export default function Header() {
     }`;
 
   return (
-    <header>
+    <header className="dark:bg-black">
       <div
         className={`flex justify-between ${isOpen ? "border-b-0" : "border-b-2"
           } px-4 py-2.5 lg:px-6`}
@@ -55,8 +60,10 @@ export default function Header() {
           <button
             className="md:flex rounded-full items-center justify-center w-12 h-10 cursor-pointer border bg-white text-black hidden"
             color="gray"
+            onClick={() => dispatch(themeToggle())}
           >
-            <Moon />
+            {theme == 'dark' ? <Moon /> : <Sun />}
+
           </button>
 
           {currentUser ? <DropdownMenu>
