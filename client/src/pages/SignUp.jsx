@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import OAuth from "@/components/common/OAuth";
 
 export default function SignUp() {
   const [username, setUsername] = useState("");
@@ -142,7 +143,7 @@ export default function SignUp() {
               "Sign Up"
             )}
           </Button>
-
+          <OAuth />
           <div className="flex gap-x-2  text-sm">
             <span>Already have an account?</span>
             <Link to="/sign-in" className="text-blue-500">

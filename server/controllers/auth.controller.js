@@ -2,8 +2,11 @@ import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { createError } from "../utils/error.js";
 import jwt from "jsonwebtoken";
+import { devLog } from "../utils/logger.js";
 
-const signUp = async (req, res, next) => {
+// --------------- @SIGN_UP ------------------
+
+export const signUp = async (req, res, next) => {
   const { username, email, password } = req.body;
 
   if (
@@ -37,7 +40,10 @@ const signUp = async (req, res, next) => {
   }
 };
 
-const signIn = async (req, res, next) => {
+// ------------------ @SIGN_IN ------------------------
+
+export const signIn = async (req, res, next) => {
+  console.log("inside controller");
   const { email, password } = req.body;
 
   if (!email || !password || email === "" || password === "") {
@@ -50,7 +56,7 @@ const signIn = async (req, res, next) => {
     return next(createError(400, "Invalid credentials"));
   }
 
-  const { password: hashedPassword, ...userDetails } = validUser._doc;
+  const { password: hashedPassword, ...rest } = validUser._doc;
 
   const validPassword = await bcryptjs.compare(password, hashedPassword);
 
@@ -62,12 +68,57 @@ const signIn = async (req, res, next) => {
     id: validUser._id,
   };
 
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "5s" });
+  const token = jwt.sign(payload, process.env.JWT_SECRET);
 
   res
     .status(200)
     .cookie("token", token, { httpOnly: true, maxAge: 5 * 1000 })
-    .json({ userDetails });
+    .json({ ...rest });
 };
 
-export { signUp, signIn };
+// ------------------ @GOOGLE_SIGN_UP_SIGN_IN ------------------------
+
+export const google = async (req, res, next) => {
+  // console.log("Google controller req body", req.body);
+  const { name, email, googlePhotoURL } = req.body;
+  // console.log("inside controller photo", googlePhotoURL);
+  try {
+    const user = await User.findOne({ email });
+
+    // If user exists in db -> Sign in
+    if (user) {
+      devLog("google api -> user already existing branch");
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const { password, ...rest } = user._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, { httpOnly: true })
+        .json(rest);
+    } else {
+      // If user doesn't exist -> create one
+      devLog("google api -> create new user branch");
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
+      const newUser = new User({
+        username:
+          name.toLowerCase().split(" ").join("") +
+          Math.random().toString(9).slice(-4), // split to last 4
+        email,
+        password: hashedPassword,
+        avatar: googlePhotoURL,
+      });
+
+      await newUser.save();
+      const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET);
+      const { password, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, { httpOnly: true })
+        .json(rest);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
