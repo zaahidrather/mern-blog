@@ -3,24 +3,28 @@ import { Link, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Menu, Moon, Search } from "lucide-react";
+import { useSelector } from "react-redux";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export default function Header() {
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
+  const currentUser = useSelector((state) => state.user.currentUser);
+
+  // console.log('currentUser', currentUser);
+
   const linkClasses = (href) =>
-    `  px-3 py-2 text-sm font-semibold transition-colors ${
-      pathname === href
-        ? " text-white bg-[#0e7490]"
-        : "text-muted-foreground  hover:text-foreground"
+    `  px-3 py-2 text-sm font-semibold transition-colors ${pathname === href
+      ? " text-white bg-[#0e7490]"
+      : "text-muted-foreground  hover:text-foreground"
     }`;
 
   return (
     <header>
       <div
-        className={`flex justify-between ${
-          isOpen ? "border-b-0" : "border-b-2"
-        } px-4 py-2.5 lg:px-6`}
+        className={`flex justify-between ${isOpen ? "border-b-0" : "border-b-2"
+          } px-4 py-2.5 lg:px-6`}
       >
         <Link
           to="/"
@@ -31,7 +35,6 @@ export default function Header() {
           </span>
           Blog
         </Link>
-
         <form>
           <div className="relative hidden lg:inline-block">
             <Input type="text" placeholder="Search..." className="pr-9" />
@@ -56,14 +59,41 @@ export default function Header() {
             <Moon />
           </button>
 
-          <Link to="/sign-in">
+          {currentUser ? <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <img
+                src={currentUser.avatar}
+                alt="User avatar"
+                referrerPolicy="no-referrer"
+                className="cursor-pointer w-10 h-10 rounded-full object-cover"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              {/* Header Section */}
+              <div className="px-2 py-1.5">
+                <p className="text-sm font-medium">@{currentUser.username}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {currentUser.email}
+                </p>
+              </div>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem><Link to={'/dashboard?tab=profile'}>
+                Profile
+              </Link></DropdownMenuItem>
+              <DropdownMenuItem >
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu> : <Link to="/sign-in">
             <Button
               variant="outline"
               className="border-2 h-10 border-purple-500 text-black"
             >
               Sign In
             </Button>
-          </Link>
+          </Link>}
 
           {/* Hamburger Icon Mobile */}
           <div>

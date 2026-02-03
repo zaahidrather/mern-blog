@@ -3,6 +3,7 @@ import bcryptjs from "bcryptjs";
 import { createError } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 import { devLog } from "../utils/logger.js";
+import admin from "../firebaseAdmin.js";
 
 // --------------- @SIGN_UP ------------------
 
@@ -79,10 +80,12 @@ export const signIn = async (req, res, next) => {
 // ------------------ @GOOGLE_SIGN_UP_SIGN_IN ------------------------
 
 export const google = async (req, res, next) => {
-  // console.log("Google controller req body", req.body);
-  const { name, email, googlePhotoURL } = req.body;
-  // console.log("inside controller photo", googlePhotoURL);
+  // const { name, email, googlePhotoURL } = req.body;
   try {
+    const { idToken } = req.body;
+    const decoded = await admin.auth().verifyIdToken(idToken);
+    const { email, name, picture } = decoded;
+
     const user = await User.findOne({ email });
 
     // If user exists in db -> Sign in
@@ -97,6 +100,7 @@ export const google = async (req, res, next) => {
     } else {
       // If user doesn't exist -> create one
       devLog("google api -> create new user branch");
+
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
         Math.random().toString(36).slice(-8);
@@ -107,7 +111,7 @@ export const google = async (req, res, next) => {
           Math.random().toString(9).slice(-4), // split to last 4
         email,
         password: hashedPassword,
-        avatar: googlePhotoURL,
+        avatar: picture,
       });
 
       await newUser.save();
