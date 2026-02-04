@@ -1,27 +1,52 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Root from "./pages/Root.jsx";
+import ProtectedRoute from "./components/common/ProtectedRoute.jsx";
 import Home from "./pages/Home.jsx";
 import About from "./pages/About.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import SignIn from "./pages/SignIn.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Projects from "./pages/Projects.jsx";
-import Header from "./components/common/Header.jsx";
-import Footer from "./components/common/Footer.jsx";
+
 function App() {
-  return (
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-      <Footer />
-    </BrowserRouter>
-  );
+  const router = createBrowserRouter([{
+    Component: Root,
+    children: [
+      {
+        path: '/',
+        Component: Home
+      },
+      {
+        path: '/about',
+        Component: About
+      },
+      {
+        path: '/sign-up',
+        Component: SignUp
+      },
+      {
+        path: '/sign-in',
+        Component: SignIn
+      },
+      {
+        path: '/projects',
+        Component: Projects
+      },
+      {
+        Component: ProtectedRoute,
+        children: [
+          {
+            path: '/dashboard',
+            Component: Dashboard
+          },
+        ]
+      }
+    ]
+  }])
+
+  return <RouterProvider router={router} />
 }
 
 export default App;
+
+
