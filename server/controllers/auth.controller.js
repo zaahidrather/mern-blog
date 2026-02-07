@@ -44,7 +44,7 @@ export const signUp = async (req, res, next) => {
 // ------------------ @SIGN_IN ------------------------
 
 export const signIn = async (req, res, next) => {
-  console.log("inside controller");
+  console.log("inside signin controller");
   const { email, password } = req.body;
 
   if (!email || !password || email === "" || password === "") {
@@ -69,12 +69,14 @@ export const signIn = async (req, res, next) => {
     id: validUser._id,
   };
 
-  const token = jwt.sign(payload, process.env.JWT_SECRET);
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
   res
     .status(200)
-    .cookie("token", token, { httpOnly: true, maxAge: 5 * 1000 })
-    .json({ ...rest });
+    .cookie("access_token", token, { httpOnly: true, maxAge: 60 * 60 * 1000 })
+    .json(rest);
 };
 
 // ------------------ @GOOGLE_SIGN_UP_SIGN_IN ------------------------
@@ -91,11 +93,16 @@ export const google = async (req, res, next) => {
     // If user exists in db -> Sign in
     if (user) {
       devLog("google api -> user already existing branch");
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
       const { password, ...rest } = user._doc;
       res
         .status(200)
-        .cookie("access_token", token, { httpOnly: true })
+        .cookie("access_token", token, {
+          httpOnly: true,
+          maxAge: 60 * 60 * 1000,
+        })
         .json(rest);
     } else {
       // If user doesn't exist -> create one
@@ -115,11 +122,16 @@ export const google = async (req, res, next) => {
       });
 
       await newUser.save();
-      const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET);
+      const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
       const { password, ...rest } = newUser._doc;
       res
         .status(200)
-        .cookie("access_token", token, { httpOnly: true })
+        .cookie("access_token", token, {
+          httpOnly: true,
+          maxAge: 60 * 60 * 1000,
+        })
         .json(rest);
     }
   } catch (error) {

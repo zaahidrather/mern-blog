@@ -1,40 +1,18 @@
-import express from "express";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
-import userRoutes from "./routes/user.routes.js";
-import authRoutes from "./routes/auth.routes.js";
+import app from "./app.js";
+import { connectToDb } from "./config/db.js";
 
-dotenv.config();
-const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use("/api/user", userRoutes);
-app.use("/api/auth", authRoutes);
-
-const connectDB = async () => {
+(async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URL);
-    console.log("MongoDB connected");
+    await connectToDb();
+
+    app.listen(PORT, () => {
+      console.log("Server running on port", PORT);
+    });
+
   } catch (error) {
-    console.log("MongoDB connection error:", error);
+    console.error("Failed to start server:", error);
     process.exit(1);
   }
-};
-
-app.listen(3000, () => {
-  connectDB();
-  console.log("Server is running on port 3000");
-});
-
-// Global error handling middleware
-app.use((err, req, res, next) => {
-  console.error("GLOBAL ERROR:", err.message);
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal server error";
-
-  res.status(statusCode).json({
-    success: false,
-    statusCode,
-    message,
-  });
-});
+})();
