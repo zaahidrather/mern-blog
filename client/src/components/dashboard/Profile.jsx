@@ -10,6 +10,7 @@ import {
 	deleteUserStart,
 	deleteUserSuccess,
 	deleteUserFailure,
+	signoutSuccess,
 } from '../../redux/user/userSlice.js';
 import { Spinner } from '../ui/spinner';
 import { Alert, AlertDescription } from '../ui/alert';
@@ -125,7 +126,6 @@ export default function Profile() {
 			const res = await fetch(`/api/user/delete/${currentUser._id}`, {
 				method: 'DELETE',
 			});
-			console.log('delete user res', res);
 			if (res.ok) {
 				dispatch(deleteUserSuccess());
 			} else {
@@ -134,6 +134,22 @@ export default function Profile() {
 			}
 		} catch (error) {
 			dispatch(deleteUserFailure(error.message));
+		}
+	}
+
+	async function handleSignout() {
+		try {
+			const res = await fetch('/api/user/signout', {
+				method: 'POST',
+			});
+			const data = await res.json();
+			if (!res.ok) {
+				console.log(data.message);
+			} else {
+				dispatch(signoutSuccess());
+			}
+		} catch (error) {
+			console.log('failed to signout', error);
 		}
 	}
 
@@ -252,7 +268,9 @@ export default function Profile() {
 					</AlertDialogContent>
 				</AlertDialog>
 
-				<span className="cursor-pointer">Sign Out</span>
+				<span onClick={handleSignout} className="cursor-pointer">
+					Sign Out
+				</span>
 			</div>
 		</div>
 	);

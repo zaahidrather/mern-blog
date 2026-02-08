@@ -13,6 +13,7 @@ import {
 } from '../ui/dropdown-menu';
 import { themeToggle } from '@/redux/theme/themeSlice';
 import { useDispatch } from 'react-redux';
+import { signoutSuccess } from '@/redux/user/userSlice';
 
 export default function Header() {
 	const { pathname } = useLocation();
@@ -31,6 +32,22 @@ export default function Header() {
 				? ' text-white bg-[#0e7490]'
 				: 'text-muted-foreground  hover:text-foreground'
 		}`;
+
+	async function handleSignout() {
+		try {
+			const res = await fetch('/api/user/signout', {
+				method: 'POST',
+			});
+			const data = await res.json();
+			if (!res.ok) {
+				console.log(data.message);
+			} else {
+				dispatch(signoutSuccess());
+			}
+		} catch (error) {
+			console.log('failed to signout', error);
+		}
+	}
 
 	return (
 		<header className="dark:bg-black">
@@ -101,7 +118,7 @@ export default function Header() {
 										Profile
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem>Sign out</DropdownMenuItem>
+								<DropdownMenuItem onClick={handleSignout}>Sign out</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					) : (

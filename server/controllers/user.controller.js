@@ -112,9 +112,32 @@ export const deleteUser = async (req, res, next) => {
   }
 
   try {
+    // 1. Find the user first to get the public_id
+    const user = await User.findById(req.params.userId);
+    if (!user) return next(createError(404, "User not found"));
+
+    // 2. If user has an avatar, delete it from Cloudinary
+    if (user.avatar && user.avatar.public_id) {
+      await deleteFromCloudinary(user.avatar.public_id);
+    }
+
+    // 3. Delete the user from MongoDB
     await User.findByIdAndDelete(req.params.userId);
-    res.status(200).json("User has been deleted successfully");
+
+    // 4. Clear the cookie so they are logged out
+    res.clearCookie("access_token").status(200).json("User has been deleted.");
   } catch (error) {
     return next(error);
+  }
+};
+
+export const signout = (req, res, next) => {
+  try {
+    res
+      .clearCookie("access_token")
+      .status(200)
+      .json("User has been signed out");
+  } catch (error) {
+    next(error);
   }
 };

@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
 	currentUser: null,
-	error: false,
+	error: null,
 	loading: false,
 };
 
@@ -67,6 +67,12 @@ const userSlice = createSlice({
 			state.loading = false;
 			state.error = action.payload;
 		},
+		signoutSuccess: (state) => {
+			console.log('signout triggered');
+			state.currentUser = null;
+			state.loading = false;
+			state.error = null;
+		},
 	},
 });
 
@@ -81,6 +87,7 @@ export const {
 	deleteUserStart,
 	deleteUserSuccess,
 	deleteUserFailure,
+	signoutSuccess,
 } = userSlice.actions;
 
 export default userSlice.reducer;

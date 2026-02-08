@@ -3,6 +3,7 @@ import {
   test,
   updateProfile,
   deleteUser,
+  signout,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middlewares.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
@@ -19,5 +20,7 @@ router.patch(
 );
 
 router.delete("/delete/:userId", verifyToken, deleteUser);
+
+router.post("/signout", signout);
 
 export default router;
