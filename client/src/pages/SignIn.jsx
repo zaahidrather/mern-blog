@@ -41,7 +41,7 @@ export default function SignIn() {
 			});
 
 			const data = await res.json();
-			console.log('user login data', data);
+			// console.log('user login data', data);
 
 			if (!res.ok) {
 				throw new Error(data.message || 'Request failed');

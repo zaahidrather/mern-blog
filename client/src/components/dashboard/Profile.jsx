@@ -6,16 +6,21 @@ import {
 	updateProfileStart,
 	updateProfileSuccess,
 	updateProfileFailure,
+	clearError,
 } from '../../redux/user/userSlice.js';
 import { Spinner } from '../ui/spinner';
 import { Alert, AlertDescription } from '../ui/alert';
-import { AlertCircleIcon } from 'lucide-react';
+import { AlertCircleIcon, Pencil } from 'lucide-react';
 
 export default function Profile() {
 	const { currentUser, loading, error: errorMessage } = useSelector((state) => state.user);
 	const [imageFileUrl, setImageFileUrl] = useState(null);
-	const [username, setUsername] = useState(currentUser.username);
-	const [email, setEmail] = useState(currentUser.email);
+	const [updateSuccessMessage, setUpdateSuccessMessage] = useState(null);
+	const [formData, setFormData] = useState({
+		username: currentUser.username,
+		email: currentUser.email,
+		password: currentUser.password,
+	});
 	const filePickerRef = useRef();
 	// console.log('current user', currentUser);
 
@@ -33,44 +38,60 @@ export default function Profile() {
 		}
 	}
 
+	function handleChange(e) {
+		// Clear Redux errors
+		if (errorMessage) {
+			dispatch(clearError());
+		}
+		// Clear the local success message
+		if (updateSuccessMessage) {
+			setUpdateSuccessMessage(null);
+		}
+		setFormData({ ...formData, [e.target.name]: e.target.value });
+		// console.log('formdata', formData);
+	}
+
 	async function handleSubmit(e) {
 		e.preventDefault();
+		if (errorMessage) {
+			dispatch(clearError());
+		}
+		if (updateSuccessMessage) {
+			setUpdateSuccessMessage(null);
+		}
 		const file = filePickerRef.current.files[0];
-		const formData = new FormData();
+		const dataToSend = new FormData();
 
-		let hasChanges = false;
-
+		// Add File (if any)
 		if (file) {
-			formData.append('profileImage', file);
-			hasChanges = true;
+			dataToSend.append('profileImage', file);
 		}
 
-		if (username !== currentUser.username) {
-			formData.append('username', username);
-			hasChanges = true;
-		}
+		// Add changed text fields from our 'formData' state
+		Object.keys(formData).forEach((key) => {
+			if (formData[key] !== currentUser[key]) dataToSend.append(key, formData[key]);
+		});
 
-		if (email !== currentUser.email) {
-			formData.append('email', email);
-			hasChanges = true;
-		}
+		// Final Check: Did anything actually get put in the dataToSend ?
+		const hasChanges = Array.from(dataToSend.entries()).length !== 0;
 
 		if (!hasChanges) {
-			console.log('No changes made');
+			dispatch(updateProfileFailure('No changes made'));
 			return;
 		}
 		try {
+			clearError();
 			dispatch(updateProfileStart());
-			const res = await fetch('/api/user/profile', {
+			const res = await fetch(`/api/user/update/${currentUser._id}`, {
 				method: 'PATCH',
-				body: formData,
-				credentials: 'include',
+				body: dataToSend,
 			});
 			const data = await res.json();
 			// console.log('res', res);
 			console.log('data', data);
 			if (res.ok) {
 				dispatch(updateProfileSuccess(data));
+				setUpdateSuccessMessage("User's profile updated successfully.");
 			}
 
 			if (!res.ok) {
@@ -103,13 +124,23 @@ export default function Profile() {
 					accept="image/*"
 					hidden
 				/>
-				<div className="h-32 w-32 cursor-pointer self-center overflow-hidden rounded-full shadow-md">
+				<div className="group relative h-32 w-32 cursor-pointer self-center overflow-hidden rounded-full shadow-md">
+					{/* Overlay */}
+					<div
+						className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black opacity-0 group-hover:opacity-80"
+						onClick={() => filePickerRef.current.click()}
+					>
+						<Pencil
+							className="h-4 w-4 transition-transform duration-300 group-hover:scale-110"
+							size={40}
+						/>
+						<div className="text-[10px] font-bold tracking-wider uppercase">Change</div>
+					</div>
 					<img
 						src={imageFileUrl || currentUser?.avatar?.secure_url}
 						onError={(e) => {
 							e.target.src = 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png';
 						}}
-						onClick={() => filePickerRef.current.click()}
 						alt="Avatar"
 						className="h-full w-full rounded-full border-8 border-[lightgray] object-cover"
 					/>
@@ -118,19 +149,27 @@ export default function Profile() {
 				<Input
 					id="username"
 					name="username"
-					onChange={(e) => setUsername(e.target.value)}
-					value={username}
+					onChange={handleChange}
+					value={formData.username}
 					type="text"
 					placeholder="Username"
 				/>
 				<Input
 					name="email"
 					id="email"
+					onChange={handleChange}
+					value={formData.email}
+					type="email"
 					placeholder="email"
-					onChange={(e) => setEmail(e.target.value)}
-					value={email}
 				/>
-				<Input type="password" id="password" placeholder="password" />
+				<Input
+					name="password"
+					type="password"
+					id="password"
+					placeholder="password"
+					onChange={handleChange}
+					value={formData.password}
+				/>
 
 				<Button type="submit" variant="default">
 					{loading ? (
@@ -145,6 +184,12 @@ export default function Profile() {
 					<Alert className="mt-5" variant="destructive">
 						<AlertCircleIcon />
 						<AlertDescription>{errorMessage}</AlertDescription>
+					</Alert>
+				)}
+				{updateSuccessMessage && (
+					<Alert className="mt-5" variant="success">
+						<AlertCircleIcon />
+						<AlertDescription>{updateSuccessMessage}</AlertDescription>
 					</Alert>
 				)}
 			</form>

@@ -47,6 +47,10 @@ const userSlice = createSlice({
 			state.loading = false;
 			state.error = action.payload;
 		},
+		clearError: (state) => {
+			console.log('Clear error triggered');
+			state.error = false;
+		},
 	},
 });
 
@@ -57,6 +61,7 @@ export const {
 	updateProfileStart,
 	updateProfileSuccess,
 	updateProfileFailure,
+	clearError,
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -16,7 +16,14 @@ app.use("/api/auth", authRoutes);
 app.use((err, req, res, next) => {
   console.error("GLOBAL ERROR:", err);
   const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal server error";
+  let message = err.message || "Internal server error";
+
+  // Handle MongoDB Duplicate Key Error globally
+  if (err.code === 11000) {
+    console.log("aaaaaaaaaaaaaaa", err);
+    const field = Object.keys(err.keyValue)[0];
+    message = `${field} already exists`;
+  }
 
   res.status(statusCode).json({
     success: false,
