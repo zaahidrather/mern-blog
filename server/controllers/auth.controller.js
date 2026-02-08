@@ -67,6 +67,7 @@ export const signIn = async (req, res, next) => {
 
   const payload = {
     id: validUser._id,
+    isAdmin: validUser.isAdmin,
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -93,9 +94,14 @@ export const google = async (req, res, next) => {
     // If user exists in db -> Sign in
     if (user) {
       devLog("google api -> user already existing branch");
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(
+        { id: user._id, isAdmin: user.isAdmin },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1h",
+        },
+      );
+
       const { password, ...rest } = user._doc;
       res
         .status(200)
@@ -122,9 +128,13 @@ export const google = async (req, res, next) => {
       });
 
       await newUser.save();
-      const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(
+        { id: newUser.id, isAdmin: newUser.isAdmin },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1h",
+        },
+      );
       const { password, ...rest } = newUser._doc;
       res
         .status(200)

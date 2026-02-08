@@ -146,6 +146,7 @@ export default function Profile() {
 			if (!res.ok) {
 				console.log(data.message);
 			} else {
+				console.log('yes yes');
 				dispatch(signoutSuccess());
 			}
 		} catch (error) {
