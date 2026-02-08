@@ -7,10 +7,26 @@ import {
 	updateProfileSuccess,
 	updateProfileFailure,
 	clearError,
+	deleteUserStart,
+	deleteUserSuccess,
+	deleteUserFailure,
 } from '../../redux/user/userSlice.js';
 import { Spinner } from '../ui/spinner';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AlertCircleIcon, Pencil } from 'lucide-react';
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogMedia,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Trash2Icon } from 'lucide-react';
 
 export default function Profile() {
 	const { currentUser, loading, error: errorMessage } = useSelector((state) => state.user);
@@ -19,7 +35,7 @@ export default function Profile() {
 	const [formData, setFormData] = useState({
 		username: currentUser.username,
 		email: currentUser.email,
-		password: currentUser.password,
+		password: '',
 	});
 	const filePickerRef = useRef();
 	// console.log('current user', currentUser);
@@ -80,7 +96,7 @@ export default function Profile() {
 			return;
 		}
 		try {
-			clearError();
+			dispatch(clearError());
 			dispatch(updateProfileStart());
 			const res = await fetch(`/api/user/update/${currentUser._id}`, {
 				method: 'PATCH',
@@ -100,6 +116,24 @@ export default function Profile() {
 			}
 		} catch (error) {
 			dispatch(updateProfileFailure(error.message));
+		}
+	}
+
+	async function handleDelete() {
+		try {
+			dispatch(deleteUserStart());
+			const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+				method: 'DELETE',
+			});
+			console.log('delete user res', res);
+			if (res.ok) {
+				dispatch(deleteUserSuccess());
+			} else {
+				// dispatch(deleteUserFailure(res));
+				console.log('failed to delete');
+			}
+		} catch (error) {
+			dispatch(deleteUserFailure(error.message));
 		}
 	}
 
@@ -180,21 +214,44 @@ export default function Profile() {
 						'Update Profile'
 					)}
 				</Button>
-				{errorMessage && (
-					<Alert className="mt-5" variant="destructive">
-						<AlertCircleIcon />
-						<AlertDescription>{errorMessage}</AlertDescription>
-					</Alert>
-				)}
-				{updateSuccessMessage && (
-					<Alert className="mt-5" variant="success">
-						<AlertCircleIcon />
-						<AlertDescription>{updateSuccessMessage}</AlertDescription>
-					</Alert>
-				)}
 			</form>
+			{errorMessage && (
+				<Alert className="mt-5" variant="destructive">
+					<AlertCircleIcon />
+					<AlertDescription>{errorMessage}</AlertDescription>
+				</Alert>
+			)}
+			{updateSuccessMessage && (
+				<Alert className="mt-5" variant="success">
+					<AlertCircleIcon />
+					<AlertDescription>{updateSuccessMessage}</AlertDescription>
+				</Alert>
+			)}
 			<div className="mt-5 flex justify-between text-red-500">
-				<span className="cursor-pointer">Delete Account</span>
+				<AlertDialog>
+					<AlertDialogTrigger asChild>
+						{<span className="cursor-pointer">Delete account</span>}
+					</AlertDialogTrigger>
+					<AlertDialogContent size="sm">
+						<AlertDialogHeader>
+							<AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+								<Trash2Icon />
+							</AlertDialogMedia>
+							<AlertDialogTitle>Delete Account?</AlertDialogTitle>
+							<AlertDialogDescription>
+								This action will permanently delete this user account and all associated data. This
+								cannot be undone.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
+							<AlertDialogAction variant="destructive" onClick={handleDelete}>
+								Delete
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+
 				<span className="cursor-pointer">Sign Out</span>
 			</div>
 		</div>

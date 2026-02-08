@@ -51,6 +51,22 @@ const userSlice = createSlice({
 			console.log('Clear error triggered');
 			state.error = false;
 		},
+		deleteUserStart: (state) => {
+			console.log('deleteUserStart triggered');
+			state.loading = true;
+			state.error = false;
+		},
+		deleteUserSuccess: (state) => {
+			console.log('deleteUserSuccess triggered');
+			state.currentUser = null;
+			state.loading = false;
+			state.error = false;
+		},
+		deleteUserFailure: (state, action) => {
+			console.log('deleteUserFailure triggered');
+			state.loading = false;
+			state.error = action.payload;
+		},
 	},
 });
 
@@ -62,6 +78,9 @@ export const {
 	updateProfileSuccess,
 	updateProfileFailure,
 	clearError,
+	deleteUserStart,
+	deleteUserSuccess,
+	deleteUserFailure,
 } = userSlice.actions;
 
 export default userSlice.reducer;

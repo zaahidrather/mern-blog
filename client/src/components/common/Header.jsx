@@ -96,8 +96,10 @@ export default function Header() {
 
 								<DropdownMenuSeparator />
 
-								<DropdownMenuItem>
-									<Link to={'/dashboard?tab=profile'}>Profile</Link>
+								<DropdownMenuItem asChild>
+									<Link className="cursor-pointer" to={'/dashboard?tab=profile'}>
+										Profile
+									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem>Sign out</DropdownMenuItem>
 							</DropdownMenuContent>
