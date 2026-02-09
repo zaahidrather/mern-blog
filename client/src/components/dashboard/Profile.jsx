@@ -143,11 +143,11 @@ export default function Profile() {
 			const res = await fetch('/api/user/signout', {
 				method: 'POST',
 			});
+
 			const data = await res.json();
 			if (!res.ok) {
 				console.log(data.message);
 			} else {
-				console.log('yes yes');
 				dispatch(signoutSuccess());
 			}
 		} catch (error) {

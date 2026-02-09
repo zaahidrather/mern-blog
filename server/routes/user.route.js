@@ -6,7 +6,7 @@ import {
   signout,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middlewares.js";
-import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyUser } from "../middlewares/verifyUser.js";
 
 const router = express.Router();
 
@@ -14,12 +14,12 @@ router.get("/test", test);
 
 router.patch(
   "/update/:userId",
-  verifyToken,
+  verifyUser,
   upload.single("profileImage"),
   updateProfile,
 );
 
-router.delete("/delete/:userId", verifyToken, deleteUser);
+router.delete("/delete/:userId", verifyUser, deleteUser);
 
 router.post("/signout", signout);
 

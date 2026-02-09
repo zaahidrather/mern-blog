@@ -15,7 +15,7 @@ export const test = (req, res) => {
 export const updateProfile = async (req, res, next) => {
   const updateData = {};
 
-  if (req.userId !== req.params.userId) {
+  if (req.user.id !== req.params.userId) {
     return next(createError(403, "You are not allowed to update this user"));
   }
 
@@ -107,7 +107,7 @@ export const updateProfile = async (req, res, next) => {
 };
 
 export const deleteUser = async (req, res, next) => {
-  if (req.userId !== req.params.userId) {
+  if (req.user.id !== req.params.userId) {
     return next(createError(403, "You are not allowed to delete this user"));
   }
 

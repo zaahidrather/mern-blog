@@ -1,5 +1,6 @@
+import React, { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import { Field, FieldLabel } from '@/components/ui/field';
 import {
 	Select,
 	SelectContent,
@@ -9,8 +10,10 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import ReactQuill from 'react-quill-new';
+const ReactQuill = React.lazy(() => import('react-quill-new'));
 import 'react-quill-new/dist/quill.snow.css';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorFallback from '@/components/common/ErrorFallback';
 
 export default function CreatePost() {
 	return (
@@ -39,8 +42,21 @@ export default function CreatePost() {
 						<Input id="picture" type="file" accept="image/*" />
 					</Field>
 				</div>
-
-				<ReactQuill theme="snow" placeholder="Write something..." className="mb-12 h-72" required />
+				<ErrorBoundary
+					FallbackComponent={ErrorFallback}
+					onReset={() => {
+						window.location.reload();
+					}}
+				>
+					<Suspense fallback={<div>Loading...</div>}>
+						<ReactQuill
+							theme="snow"
+							placeholder="Write something..."
+							className="mb-12 h-72"
+							required
+						/>
+					</Suspense>
+				</ErrorBoundary>
 				<Button type="submit">Publish</Button>
 			</form>
 		</div>

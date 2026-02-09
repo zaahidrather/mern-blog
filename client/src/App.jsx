@@ -1,15 +1,22 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+
+// Static Imports (Loaded immediately for fast FCP)
 import Root from './pages/Root.jsx';
-import ProtectedRoute from './components/common/ProtectedRoute.jsx';
 import Home from './pages/Home.jsx';
-import About from './pages/About.jsx';
-import SignUp from './pages/SignUp.jsx';
-import SignIn from './pages/SignIn.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import Projects from './pages/Projects.jsx';
+
+// Components used for logic/wrapping should remain static
+import ProtectedRoute from './components/common/ProtectedRoute.jsx';
 import AuthRoute from './components/common/AuthRoute.jsx';
-import CreatePost from './pages/CreatePost.jsx';
 import AdminRoute from './components/common/AdminRoute.jsx';
+
+// Lazy Loaded Routes (Split into separate chunks)
+const About = lazy(() => import('./pages/About.jsx'));
+const SignUp = lazy(() => import('./pages/SignUp.jsx'));
+const SignIn = lazy(() => import('./pages/SignIn.jsx'));
+const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
+const Projects = lazy(() => import('./pages/Projects.jsx'));
+const CreatePost = lazy(() => import('./pages/CreatePost.jsx'));
 
 function App() {
 	const router = createBrowserRouter([
@@ -63,7 +70,17 @@ function App() {
 		},
 	]);
 
-	return <RouterProvider router={router} />;
+	return (
+		<Suspense
+			fallback={
+				<div className="flex h-screen animate-pulse items-center justify-center text-4xl text-red-400">
+					Loading...
+				</div>
+			}
+		>
+			<RouterProvider router={router} />
+		</Suspense>
+	);
 }
 
 export default App;

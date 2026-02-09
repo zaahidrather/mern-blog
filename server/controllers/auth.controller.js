@@ -44,7 +44,7 @@ export const signUp = async (req, res, next) => {
 // ------------------ @SIGN_IN ------------------------
 
 export const signIn = async (req, res, next) => {
-  console.log("inside signin controller");
+  // console.log("Inside SignIn controller");
   const { email, password } = req.body;
 
   if (!email || !password || email === "" || password === "") {

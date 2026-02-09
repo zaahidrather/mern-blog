@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import { devLog } from "../utils/logger.js";
+// import { devLog } from "../utils/logger.js";
 
-export const verifyToken = (req, res, next) => {
+export const verifyUser = (req, res, next) => {
   const token = req.cookies.access_token;
   // devLog("verify token : ", token);
   if (!token) {
@@ -10,7 +10,7 @@ export const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.id; // Payload of token : {id: validUser._id,}
+    req.user = decoded; // Payload of token : {id: validUser._id, isAdmin: boolean}
     // devLog("verify token decoded", decoded);
     next();
   } catch (err) {
