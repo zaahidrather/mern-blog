@@ -7,6 +7,9 @@ import SignUp from './pages/SignUp.jsx';
 import SignIn from './pages/SignIn.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Projects from './pages/Projects.jsx';
+import AuthRoute from './components/common/AuthRoute.jsx';
+import CreatePost from './pages/CreatePost.jsx';
+import AdminRoute from './components/common/AdminRoute.jsx';
 
 function App() {
 	const router = createBrowserRouter([
@@ -22,16 +25,21 @@ function App() {
 					Component: About,
 				},
 				{
-					path: '/sign-up',
-					Component: SignUp,
-				},
-				{
-					path: '/sign-in',
-					Component: SignIn,
-				},
-				{
 					path: '/projects',
 					Component: Projects,
+				},
+				{
+					Component: AuthRoute,
+					children: [
+						{
+							path: '/sign-up',
+							Component: SignUp,
+						},
+						{
+							path: '/sign-in',
+							Component: SignIn,
+						},
+					],
 				},
 				{
 					Component: ProtectedRoute,
@@ -39,6 +47,15 @@ function App() {
 						{
 							path: '/dashboard',
 							Component: Dashboard,
+						},
+					],
+				},
+				{
+					Component: AdminRoute,
+					children: [
+						{
+							path: '/create-post',
+							Component: CreatePost,
 						},
 					],
 				},

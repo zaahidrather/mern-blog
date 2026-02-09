@@ -28,6 +28,7 @@ import {
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Trash2Icon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Profile() {
 	const { currentUser, loading, error: errorMessage } = useSelector((state) => state.user);
@@ -231,6 +232,13 @@ export default function Profile() {
 						'Update Profile'
 					)}
 				</Button>
+				{currentUser.isAdmin && (
+					<Link to="/create-post">
+						<Button className="w-full" type="button" variant="secondary">
+							Create a post
+						</Button>
+					</Link>
+				)}
 			</form>
 			{errorMessage && (
 				<Alert className="mt-5" variant="destructive">
