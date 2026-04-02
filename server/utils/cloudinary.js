@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import { devLog } from "./logger.js";
+import { devLogger } from "./logger.js";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -8,6 +8,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Uploading image using basic authentication of cloudinary (for Profile image)
 const uploadOnCloudinary = async (localFilePath) => {
   try {
     if (!localFilePath) {
@@ -20,13 +21,15 @@ const uploadOnCloudinary = async (localFilePath) => {
     });
 
     fs.unlinkSync(localFilePath); // cleanup local file
-    // devLog("File is uploaded on cloudinary", response.url);
-    // devLog("object from cloudinary", response);
+    devLogger("File is uploaded on cloudinary", response.url);
+    devLogger("object from cloudinary", response);
     return response;
   } catch (error) {
     console.error("Cloudinary error:", error);
     // Incase file not successfully uploaded
-    fs.unlinkSync(localFilePath);
+    if (fs.existsSync(localFilePath)) {
+      fs.unlinkSync(localFilePath);
+    }
     return null;
   }
 };
@@ -39,7 +42,7 @@ const deleteFromCloudinary = async (public_Id) => {
       resource_type: "image",
     });
 
-    devLog("Cloudinary delete result:", result);
+    devLogger("Cloudinary delete result:", result);
 
     return result;
   } catch (error) {

@@ -123,9 +123,7 @@ export default function Header() {
 						</DropdownMenu>
 					) : (
 						<Link to="/sign-in">
-							<Button variant="outline" className="h-10 border-2 border-purple-500 text-black">
-								Sign In
-							</Button>
+							<Button variant="outline">Sign In</Button>
 						</Link>
 					)}
 

@@ -5,6 +5,7 @@ import {
   uploadOnCloudinary,
   deleteFromCloudinary,
 } from "../utils/cloudinary.js";
+import { devLogger } from "../utils/logger.js";
 
 export const test = (req, res) => {
   res.json({
@@ -69,26 +70,26 @@ export const updateProfile = async (req, res, next) => {
       const uploaded = await uploadOnCloudinary(req.file.path);
 
       if (!uploaded) {
-        console.log("Not uploaded");
+        devLogger("Not uploaded");
         return next(createError(500, "Image upload failed"));
       }
-      console.log("Uploaded");
+      devLogger("Uploaded");
       updateData.avatar = {
         secure_url: uploaded.secure_url,
         public_id: uploaded.public_id,
       };
 
-      console.log("updateData", updateData);
+      devLogger("updateData", updateData);
     }
 
     // 3. Update only changed fields
     const updatedUser = await User.findByIdAndUpdate(
-      req.userId,
+      req.user.id,
       { $set: updateData },
       { new: true },
     ).select("-password");
-    console.log("After upload image , old public_id", oldPublicId);
-    console.log("After upload image , updatedUser", updatedUser);
+    devLogger("After upload image , old public_id", oldPublicId);
+    devLogger("After upload image , updatedUser", updatedUser);
 
     // Send the SUCCESS response immediately
     res.status(200).json(updatedUser);
@@ -96,7 +97,7 @@ export const updateProfile = async (req, res, next) => {
     if (req.file && oldPublicId) {
       try {
         await deleteFromCloudinary(oldPublicId);
-        console.log("Old image deleted successfully");
+        devLogger("Old image deleted successfully");
       } catch (err) {
         console.error("Cleanup Error (Old image not deleted):", err.message);
       }

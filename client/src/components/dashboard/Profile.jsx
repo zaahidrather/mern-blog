@@ -33,7 +33,7 @@ import { Link } from 'react-router-dom';
 export default function Profile() {
 	const { currentUser, loading, error: errorMessage } = useSelector((state) => state.user);
 	const [imageFileUrl, setImageFileUrl] = useState(null);
-	const [updateSuccessMessage, setUpdateSuccessMessage] = useState(null);
+	const [statusMessage, setStatusMessage] = useState(null);
 	const [formData, setFormData] = useState({
 		username: currentUser.username,
 		email: currentUser.email,
@@ -52,7 +52,10 @@ export default function Profile() {
 				console.log('URL revoked');
 			}
 			setImageFileUrl(URL.createObjectURL(file));
-			if (imageFileUrl) console.log('imagefileurl', imageFileUrl);
+
+			if (imageFileUrl) {
+				console.log('imagefileurl', imageFileUrl);
+			}
 		}
 	}
 
@@ -62,8 +65,8 @@ export default function Profile() {
 			dispatch(clearError());
 		}
 		// Clear the local success message
-		if (updateSuccessMessage) {
-			setUpdateSuccessMessage(null);
+		if (statusMessage) {
+			setStatusMessage(null);
 		}
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 		// console.log('formdata', formData);
@@ -74,8 +77,8 @@ export default function Profile() {
 		if (errorMessage) {
 			dispatch(clearError());
 		}
-		if (updateSuccessMessage) {
-			setUpdateSuccessMessage(null);
+		if (statusMessage) {
+			setStatusMessage(null);
 		}
 		const file = filePickerRef.current.files[0];
 		const dataToSend = new FormData();
@@ -87,7 +90,8 @@ export default function Profile() {
 
 		// Add changed text fields from our 'formData' state
 		Object.keys(formData).forEach((key) => {
-			if (formData[key] !== currentUser[key]) dataToSend.append(key, formData[key]);
+			if (formData[key] !== currentUser[key] && formData[key] !== '')
+				dataToSend.append(key, formData[key]);
 		});
 
 		// Final Check: Did anything actually get put in the dataToSend ?
@@ -103,13 +107,14 @@ export default function Profile() {
 			const res = await fetch(`/api/user/update/${currentUser._id}`, {
 				method: 'PATCH',
 				body: dataToSend,
+				credentials: 'include',
 			});
 			const data = await res.json();
 			// console.log('res', res);
 			console.log('data', data);
 			if (res.ok) {
 				dispatch(updateProfileSuccess(data));
-				setUpdateSuccessMessage("User's profile updated successfully.");
+				setStatusMessage("User's profile updated successfully.");
 			}
 
 			if (!res.ok) {
@@ -246,10 +251,10 @@ export default function Profile() {
 					<AlertDescription>{errorMessage}</AlertDescription>
 				</Alert>
 			)}
-			{updateSuccessMessage && (
+			{statusMessage && (
 				<Alert className="mt-5" variant="success">
 					<AlertCircleIcon />
-					<AlertDescription>{updateSuccessMessage}</AlertDescription>
+					<AlertDescription>{statusMessage}</AlertDescription>
 				</Alert>
 			)}
 			<div className="mt-5 flex justify-between text-red-500">

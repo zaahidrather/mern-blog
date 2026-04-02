@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { createError } from "../utils/error.js";
 import jwt from "jsonwebtoken";
-import { devLog } from "../utils/logger.js";
+import { devLogger } from "../utils/logger.js";
 import admin from "../firebaseAdmin.js";
 
 // --------------- @SIGN_UP ------------------
@@ -71,12 +71,15 @@ export const signIn = async (req, res, next) => {
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "1d",
   });
 
   res
     .status(200)
-    .cookie("access_token", token, { httpOnly: true, maxAge: 60 * 60 * 1000 })
+    .cookie("access_token", token, {
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 1000,
+    })
     .json(rest);
 };
 
@@ -93,12 +96,12 @@ export const google = async (req, res, next) => {
 
     // If user exists in db -> Sign in
     if (user) {
-      devLog("google api -> user already existing branch");
+      devLogger("google api -> user already existing branch");
       const token = jwt.sign(
         { id: user._id, isAdmin: user.isAdmin },
         process.env.JWT_SECRET,
         {
-          expiresIn: "1h",
+          expiresIn: "1d",
         },
       );
 
@@ -107,12 +110,12 @@ export const google = async (req, res, next) => {
         .status(200)
         .cookie("access_token", token, {
           httpOnly: true,
-          maxAge: 60 * 60 * 1000,
+          maxAge: 60 * 60 * 24 * 1000,
         })
         .json(rest);
     } else {
       // If user doesn't exist -> create one
-      devLog("google api -> create new user branch");
+      devLogger("google api -> create new user branch");
 
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -132,7 +135,7 @@ export const google = async (req, res, next) => {
         { id: newUser.id, isAdmin: newUser.isAdmin },
         process.env.JWT_SECRET,
         {
-          expiresIn: "1h",
+          expiresIn: "1d",
         },
       );
       const { password, ...rest } = newUser._doc;
@@ -140,7 +143,7 @@ export const google = async (req, res, next) => {
         .status(200)
         .cookie("access_token", token, {
           httpOnly: true,
-          maxAge: 60 * 60 * 1000,
+          maxAge: 60 * 60 * 24 * 1000,
         })
         .json(rest);
     }

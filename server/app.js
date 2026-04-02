@@ -23,9 +23,9 @@ app.use((err, req, res, next) => {
 
   // Handle MongoDB Duplicate Key Error globally
   if (err.code === 11000) {
-    console.log("aaaaaaaaaaaaaaa", err);
+    // console.log("aaaaaaaaaaaaaaa", err);
     const field = Object.keys(err.keyValue)[0];
-    message = `${field} already exists`;
+    message = `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`;
   }
 
   res.status(statusCode).json({
