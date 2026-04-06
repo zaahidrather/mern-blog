@@ -1,13 +1,15 @@
 import { signoutSuccess } from '@/redux/user/userSlice';
-import { ArrowRight, User } from 'lucide-react';
+import { ArrowRight, FileText, User } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 export default function DashSidebar() {
 	const { search } = useLocation();
 	const urlSearchParams = new URLSearchParams(search);
 	const activeTab = urlSearchParams.get('tab');
 	const dispatch = useDispatch();
+	const { currentUser } = useSelector((state) => state.user);
 
 	const isActive = (tab) => (tab == activeTab ? 'bg-gray-500' : '');
 
@@ -34,10 +36,21 @@ export default function DashSidebar() {
 			<nav className="space-y-2">
 				<Link
 					to="/dashboard?tab=profile"
-					className={`flex gap-2 rounded px-4 py-2 ${isActive('profile')}`}
+					className={`flex items-center gap-2 rounded px-4 py-2 ${isActive('profile')}`}
 				>
 					<User /> Profile
+					<span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-blue-600 uppercase">
+						{currentUser.isAdmin ? 'Admin' : 'User'}
+					</span>
 				</Link>
+				{currentUser.isAdmin && (
+					<Link
+						to="/dashboard?tab=posts"
+						className={`flex gap-2 rounded px-4 py-2 ${isActive('posts')}`}
+					>
+						<FileText /> Posts
+					</Link>
+				)}
 				<button
 					onClick={handleSignout}
 					className={`flex w-full gap-2 rounded px-4 py-2 ${isActive('')}`}
