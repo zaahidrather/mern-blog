@@ -3,7 +3,7 @@ import { createError } from "../utils/error.js";
 import { v2 as cloudinary } from "cloudinary";
 
 export const create = async (req, res, next) => {
-  // console.log("Create post body", req.body);
+  console.log("Create post body", req.body);
   if (!req.user.isAdmin) {
     return next(createError(403, "You are not allowed to create a post"));
   }
@@ -21,9 +21,9 @@ export const create = async (req, res, next) => {
     ...req.body,
     slug,
     userId: req.user.id,
-    category: "uncategorized",
+    category: req.body.category || "uncategorized",
     image:
-      req.body.secure_url ||
+      req.body.image ||
       "https://www.pexels.com/photo/grass-hill-under-a-clear-blue-sky-16452613/",
   });
   try {
@@ -53,4 +53,49 @@ export const generateSignature = (req, res, next) => {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiKey: process.env.CLOUDINARY_API_KEY,
   });
+};
+
+export const getposts = async (req, res, next) => {
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.order === "asc" ? 1 : -1;
+    const posts = await Post.find({
+      ...(req.query.userId && { userId: req.query.userId }),
+      ...(req.query.category && { category: req.query.category }),
+      ...(req.query.slug && { slug: req.query.slug }),
+      ...(req.query.postId && { _id: req.query.postId }),
+      ...(req.query.searchTerm && {
+        $or: [
+          { title: { $regex: req.query.searchTerm, $options: "i" } },
+          { content: { $regex: req.query.searchTerm, $options: "i" } },
+        ],
+      }),
+    })
+      .sort({ updatedAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+
+    const totalPosts = await Post.countDocuments();
+
+    const now = new Date();
+
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate(),
+    );
+
+    const lastMonthPosts = await Post.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
+    });
+
+    res.status(200).json({
+      posts,
+      totalPosts,
+      lastMonthPosts,
+    });
+  } catch (error) {
+    next(error);
+  }
 };

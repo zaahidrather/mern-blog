@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { devLogger } from "../utils/logger.js";
+// import { devLogger } from "../utils/logger.js";
 
 export const verifyUser = (req, res, next) => {
   const token = req.cookies.access_token;

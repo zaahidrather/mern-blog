@@ -18,6 +18,7 @@ import axios from 'axios';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircleIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Spinner } from '@/components/ui/spinner';
 // import { useNavigate } from 'react-router-dom';
 
 export default function CreatePost() {
@@ -27,6 +28,7 @@ export default function CreatePost() {
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [uploadError, setUploadError] = useState(null);
 	const [publishError, setPublishError] = useState(null);
+	const [selectedFile, setSelectedFile] = useState(null);
 	const [postData, setPostData] = useState({
 		title: null,
 		content: null,
@@ -35,28 +37,20 @@ export default function CreatePost() {
 	});
 	// const navigate = useNavigate();
 
-	async function handleImage(e) {
-		const file = e.target.files[0];
+	async function handleImage() {
+		const file = selectedFile;
 		if (!file) return;
 
 		const imageUploadData = new FormData();
 
-		// Generate a local temporary URL for instant image preview
-		// 1. Instant Preview
-		if (imageFileUrl) URL.revokeObjectURL(imageFileUrl);
-		setImageFileUrl(URL.createObjectURL(file));
-
-		// Clear any previous errors before starting
-		setUploadError(null);
-
 		try {
 			setIsUploading(true);
 
-			// 2. Get Signature
+			// 1. Get Signature
 			const { data } = await axios.get('/api/post/sign-upload');
 			const { apiKey, timestamp, signature, cloudName } = data;
 
-			// 3. Prepare Cloudinary Data
+			// 2. Prepare Cloudinary Data
 			imageUploadData.append('file', file);
 			imageUploadData.append('api_key', apiKey);
 			imageUploadData.append('timestamp', timestamp);
@@ -64,22 +58,20 @@ export default function CreatePost() {
 			imageUploadData.append('folder', 'mern-blog/posts');
 			// if (data) console.log('data from sign-upload api', data);
 
-			// 4. Upload directly to Cloudinary
+			// 3. Upload directly to Cloudinary
 			const res = await axios.post(
 				`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
 				imageUploadData,
 				{
 					onUploadProgress: (progressEvent) => {
 						const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-
-						// Update a React state variable
 						setUploadProgress(percentage);
 					},
 				},
 			);
 
 			// Success
-			setPostData({ ...postData, image: res.data.secure_url });
+			setPostData((prev) => ({ ...prev, image: res.data.secure_url }));
 		} catch (error) {
 			const errorMsg =
 				error.response?.data?.error?.message || // Cloudinary error format
@@ -90,7 +82,7 @@ export default function CreatePost() {
 
 			// Reset preview so user knows it didn't save
 			setImageFileUrl(null);
-			setPostData({ ...postData, image: null });
+			setPostData((prev) => ({ ...prev, image: null }));
 		} finally {
 			setIsUploading(false);
 			setUploadProgress(0);
@@ -98,7 +90,8 @@ export default function CreatePost() {
 	}
 
 	function handleChange(e) {
-		setPostData({ ...postData, [e.target.name]: e.target.value });
+		const { name, value } = e.target;
+		setPostData((prev) => ({ ...prev, [name]: value }));
 	}
 
 	async function handleSubmit(e) {
@@ -135,6 +128,7 @@ export default function CreatePost() {
 		<div className="mx-auto min-h-screen max-w-3xl p-3">
 			<h1 className="my-7 text-center text-3xl font-semibold">Create a post</h1>
 			<form className="flex flex-col gap-4">
+				{/* Title */}
 				<div className="flex flex-col justify-between gap-4 sm:flex-row">
 					<Input
 						placeholder="Title"
@@ -142,9 +136,11 @@ export default function CreatePost() {
 						id="title"
 						name="title"
 						onChange={handleChange}
+						value={postData.title ?? ''}
 						className="flex-1"
 					/>
 					<Select
+						value={postData.category}
 						onValueChange={(value) =>
 							setPostData((prev) => ({
 								...prev,
@@ -153,7 +149,7 @@ export default function CreatePost() {
 						}
 					>
 						<SelectTrigger className="w-[180px]">
-							<SelectValue placeholder="Select a category" />
+							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectGroup>
@@ -165,18 +161,55 @@ export default function CreatePost() {
 						</SelectContent>
 					</Select>
 				</div>
+				{/* Image */}
 				<div className="flex items-center justify-between gap-4 border-4 border-dotted p-3">
 					<Field>
 						<FieldLabel htmlFor="picture">Image</FieldLabel>
-						<div className="flex gap-x-2">
+						<div className="flex items-center gap-x-2">
 							<Input
 								id="picture"
+								onChange={(e) => {
+									const file = e.target.files[0];
+									if (!file) return;
+									setSelectedFile(file); // Store for upload
+									if (imageFileUrl) URL.revokeObjectURL(imageFileUrl);
+									setImageFileUrl(URL.createObjectURL(file)); //  instant preview
+									setUploadError(null);
+								}}
 								type="file"
 								accept="image/*"
-								onChange={handleImage}
 								ref={filePickerRef}
+								className="hidden"
 							/>
-							<Button onClick={handleImage}>Upload Image</Button>
+							<Button
+								type="button"
+								disabled={isUploading}
+								onClick={() => filePickerRef.current.click()}
+							>
+								Select Image
+							</Button>
+
+							<Button
+								type="button"
+								className="w-36"
+								disabled={!selectedFile || isUploading}
+								onClick={handleImage}
+							>
+								{isUploading ? (
+									<>
+										<Spinner /> <span>Uploading</span>
+									</>
+								) : (
+									'Upload Image'
+								)}
+							</Button>
+							{selectedFile ? (
+								<p className="text-sm text-gray-500">
+									{selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+								</p>
+							) : (
+								<p className="text-sm text-gray-500">No file selected</p>
+							)}
 						</div>
 						<div className="relative h-40 w-40">
 							{isUploading ? (
@@ -188,7 +221,7 @@ export default function CreatePost() {
 									</div>
 								</div>
 							) : (
-								postData.image && (
+								imageFileUrl && (
 									<img src={imageFileUrl} alt="" className="h-full w-full object-cover" />
 								)
 							)}
@@ -228,6 +261,7 @@ export default function CreatePost() {
 						}
 					>
 						<ReactQuill
+							value={postData.content ?? ''}
 							theme="snow"
 							placeholder="Write something..."
 							className="mb-12 h-72"

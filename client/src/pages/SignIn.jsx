@@ -117,7 +117,7 @@ export default function SignIn() {
 					<Button size="lg" disabled={loading}>
 						{loading ? (
 							<>
-								<Spinner /> <span>Signing In...</span>
+								<Spinner /> <span>Signing In</span>
 							</>
 						) : (
 							'Sign In'
