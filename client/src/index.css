@@ -127,6 +127,31 @@
 	[role='button']:not(:disabled) {
 		cursor: pointer;
 	}
+
+	/* Styling the scrollbar globally for the table container */
+	.overflow-x-auto {
+		scrollbar-width: thin; /* For Firefox */
+		scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+	}
+
+	/* For Chrome, Safari, and Edge */
+	.overflow-x-auto::-webkit-scrollbar {
+		height: 6px; /* Makes the horizontal scrollbar thinner */
+		background: red;
+	}
+
+	.overflow-x-auto::-webkit-scrollbar-track {
+		background: red;
+	}
+
+	.overflow-x-auto::-webkit-scrollbar-thumb {
+		background: hsl(var(--muted-foreground) / 0.3); /* Uses Shadcn's theme colors */
+		border-radius: 10px;
+	}
+
+	.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+		background: hsl(var(--muted-foreground) / 0.5);
+	}
 }
 
 @layer components {
