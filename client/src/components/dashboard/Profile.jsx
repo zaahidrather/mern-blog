@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Trash2Icon } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export default function Profile() {
 	const { currentUser, loading, error: errorMessage } = useSelector((state) => state.user);
@@ -74,89 +75,95 @@ export default function Profile() {
 
 	async function handleSubmit(e) {
 		e.preventDefault();
-		if (errorMessage) {
-			dispatch(clearError());
-		}
-		if (statusMessage) {
-			setStatusMessage(null);
-		}
+
+		// 1. Reset previous messages
+		if (errorMessage) dispatch(clearError());
+		if (statusMessage) setStatusMessage(null);
+
 		const file = filePickerRef.current.files[0];
 		const dataToSend = new FormData();
 
-		// Add File (if any)
+		// 2. Build FormData
 		if (file) {
 			dataToSend.append('profileImage', file);
 		}
 
-		// Add changed text fields from our 'formData' state
 		Object.keys(formData).forEach((key) => {
-			if (formData[key] !== currentUser[key] && formData[key] !== '')
+			if (formData[key] !== currentUser[key] && formData[key] !== '') {
 				dataToSend.append(key, formData[key]);
+			}
 		});
 
-		// Final Check: Did anything actually get put in the dataToSend ?
-		const hasChanges = Array.from(dataToSend.entries()).length !== 0;
-
-		if (!hasChanges) {
+		// 3. Check for changes
+		if (Array.from(dataToSend.entries()).length === 0) {
 			dispatch(updateProfileFailure('No changes made'));
 			return;
 		}
-		try {
-			dispatch(clearError());
-			dispatch(updateProfileStart());
-			const res = await fetch(`/api/user/update/${currentUser._id}`, {
-				method: 'PATCH',
-				body: dataToSend,
-				credentials: 'include',
-			});
-			const data = await res.json();
-			// console.log('res', res);
-			console.log('data', data);
-			if (res.ok) {
-				dispatch(updateProfileSuccess(data));
-				setStatusMessage("User's profile updated successfully.");
-			}
 
-			if (!res.ok) {
-				dispatch(updateProfileFailure(data.message || 'Update failed'));
-				return;
-			}
+		try {
+			dispatch(updateProfileStart());
+
+			// 4. Axios Request
+			const res = await axios.patch(`/api/user/update/${currentUser._id}`, dataToSend);
+
+			// 5. Success Handling
+			dispatch(updateProfileSuccess(res.data));
+			setStatusMessage("User's profile updated successfully.");
 		} catch (error) {
-			dispatch(updateProfileFailure(error.message));
+			// 6. Error Handling
+			const status = error.response?.status;
+
+			if (status !== 401 && status !== 403) {
+				const errorMsg = error.response?.data?.message || error.message;
+				dispatch(updateProfileFailure(errorMsg));
+			}
 		}
 	}
 
+	// async function handleDelete() {
+	// 	try {
+	// 		dispatch(deleteUserStart());
+	// 		const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+	// 			method: 'DELETE',
+	// 		});
+	// 		if (res.ok) {
+	// 			dispatch(deleteUserSuccess());
+	// 		} else {
+	// 			// dispatch(deleteUserFailure(res));
+	// 			console.log('failed to delete');
+	// 		}
+	// 	} catch (error) {
+	// 		dispatch(deleteUserFailure(error.message));
+	// 	}
+	// }
 	async function handleDelete() {
 		try {
 			dispatch(deleteUserStart());
-			const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-				method: 'DELETE',
-			});
-			if (res.ok) {
-				dispatch(deleteUserSuccess());
-			} else {
-				// dispatch(deleteUserFailure(res));
-				console.log('failed to delete');
-			}
+
+			await axios.delete(`/api/user/delete/${currentUser._id}`);
+
+			dispatch(deleteUserSuccess());
 		} catch (error) {
-			dispatch(deleteUserFailure(error.message));
+			const status = error.response?.status;
+
+			if (status !== 401 && status !== 403) {
+				const errorMessage = error.response?.data?.message || error.message;
+				dispatch(deleteUserFailure(errorMessage));
+			}
 		}
 	}
 
 	async function handleSignout() {
 		try {
-			const res = await fetch('/api/user/signout', {
-				method: 'POST',
-			});
+			await axios.post('/api/user/signout');
 
-			const data = await res.json();
-			if (!res.ok) {
-				console.log(data.message);
-			} else {
-				dispatch(signoutSuccess());
-			}
+			// If the request is successful, the interceptor does nothing.
+			// We manually dispatch here for a intentional logout.
+			dispatch(signoutSuccess());
 		} catch (error) {
-			console.log('failed to signout', error);
+			// If this call fails with a 401/403,
+			// Axios interceptor will automatically trigger signoutSuccess()!
+			console.log('Failed to signout', error.response?.data?.message);
 		}
 	}
 

@@ -6,7 +6,7 @@ import {
   signout,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middlewares.js";
-import { verifyUser } from "../middlewares/verifyUser.js";
+import verifyUser from "../middlewares/verifyUser.js";
 
 const router = express.Router();
 

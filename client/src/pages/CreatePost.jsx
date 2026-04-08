@@ -19,6 +19,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircleIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Spinner } from '@/components/ui/spinner';
+import api from '@/api/axiosInstance';
 // import { useNavigate } from 'react-router-dom';
 
 export default function CreatePost() {
@@ -47,7 +48,7 @@ export default function CreatePost() {
 			setIsUploading(true);
 
 			// 1. Get Signature
-			const { data } = await axios.get('/api/post/sign-upload');
+			const { data } = await api.get('/post/sign-upload');
 			const { apiKey, timestamp, signature, cloudName } = data;
 
 			// 2. Prepare Cloudinary Data
@@ -101,7 +102,7 @@ export default function CreatePost() {
 			setUploadError(null);
 			setPublishError(null);
 
-			await axios.post('/api/post/create', postData);
+			await api.post('/post/create', postData);
 			toast.success('Post published successfully!');
 			setPostData({
 				title: '',

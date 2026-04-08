@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
 	Table,
@@ -9,7 +10,20 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { Link } from 'react-router-dom';
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogMedia,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Trash2Icon } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function DashPosts() {
 	const { currentUser } = useSelector((state) => state.user);
@@ -18,10 +32,12 @@ export default function DashPosts() {
 
 	useEffect(() => {
 		async function fetchPosts() {
-			console.log('fetch posts');
 			try {
 				const res = await axios.get(`/api/post/getposts?id=${currentUser._id}`);
 				setPosts(res.data.posts);
+				if (res.data.posts.length < 9) {
+					setShowMore(false);
+				}
 			} catch (error) {
 				console.error(error.message);
 			}
@@ -31,17 +47,31 @@ export default function DashPosts() {
 		}
 	}, [currentUser._id]);
 
+	// Show more posts
 	async function handleShowMore() {
 		const startIndex = posts.length;
-		console.log('posts.length', posts.length);
 		const res = await axios.get(
 			`/api/post/getposts?id=${currentUser._id}&startIndex=${startIndex}`,
 		);
 		setPosts((prev) => [...prev, ...res.data.posts]);
 		if (res.data.posts.length < 9) {
-			console.log('less than');
 			setShowMore(false);
 		}
+	}
+
+	// Delete post
+	async function handleDelete(postId) {
+		const deletePromise = axios.delete(`/api/post/deletepost/${postId}/${currentUser._id}`);
+
+		toast.promise(deletePromise, {
+			loading: 'Deleting post...',
+			success: () => {
+				// Update the UI state after success
+				setPosts((prev) => prev.filter((post) => post._id !== postId));
+				return 'Post deleted successfully!';
+			},
+			error: (err) => err.response?.data?.message || 'Could not delete post.',
+		});
 	}
 
 	return (
@@ -93,9 +123,33 @@ export default function DashPosts() {
 									<TableCell className="capitalize">{post.category}</TableCell>
 
 									<TableCell>
-										<span className="cursor-pointer font-medium text-red-500 hover:underline">
-											Delete
-										</span>
+										<AlertDialog>
+											<AlertDialogTrigger asChild>
+												<span className="cursor-pointer font-medium text-red-500 hover:underline">
+													Delete
+												</span>
+											</AlertDialogTrigger>
+											<AlertDialogContent size="sm">
+												<AlertDialogHeader>
+													<AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+														<Trash2Icon />
+													</AlertDialogMedia>
+													<AlertDialogTitle>Delete Post?</AlertDialogTitle>
+													<AlertDialogDescription>
+														This action will permanently delete this post.
+													</AlertDialogDescription>
+												</AlertDialogHeader>
+												<AlertDialogFooter>
+													<AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
+													<AlertDialogAction
+														variant="destructive"
+														onClick={() => handleDelete(post._id)}
+													>
+														Delete
+													</AlertDialogAction>
+												</AlertDialogFooter>
+											</AlertDialogContent>
+										</AlertDialog>
 									</TableCell>
 
 									<TableCell className="text-right">

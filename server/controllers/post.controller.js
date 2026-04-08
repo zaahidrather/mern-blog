@@ -2,11 +2,32 @@ import Post from "../models/post.model.js";
 import { createError } from "../utils/error.js";
 import { v2 as cloudinary } from "cloudinary";
 
+// Generating signature for cloudinary signed upload (required on frontend)
+export const generateSignature = (req, res, next) => {
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  const folder = req.query.folder || "mern-blog/posts";
+  // The signature must include all parameters you plan to send from the frontend
+  const signature = cloudinary.utils.api_sign_request(
+    {
+      timestamp: timestamp,
+      folder,
+    },
+    process.env.CLOUDINARY_API_SECRET, // Using the secret already configured above
+  );
+  // console.log("Signature........", signature);
+  res.json({
+    signature,
+    timestamp,
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+  });
+};
+
+// Create
 export const create = async (req, res, next) => {
-  console.log("Create post body", req.body);
-  if (!req.user.isAdmin) {
-    return next(createError(403, "You are not allowed to create a post"));
-  }
+  // if (!req.user.isAdmin) {
+  //   return next(createError(403, "You are not allowed to create a post"));
+  // }
   if (!req.body.title || !req.body.content) {
     return next(createError(400, "Please provide all required fields"));
   }
@@ -34,28 +55,8 @@ export const create = async (req, res, next) => {
   }
 };
 
-// Generating signature for cloudinary signed upload (required on frontend)
-export const generateSignature = (req, res, next) => {
-  const timestamp = Math.round(new Date().getTime() / 1000);
-  const folder = req.query.folder || "mern-blog/posts";
-  // The signature must include all parameters you plan to send from the frontend
-  const signature = cloudinary.utils.api_sign_request(
-    {
-      timestamp: timestamp,
-      folder,
-    },
-    process.env.CLOUDINARY_API_SECRET, // Using the secret already configured above
-  );
-  // console.log("Signature........", signature);
-  res.json({
-    signature,
-    timestamp,
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-    apiKey: process.env.CLOUDINARY_API_KEY,
-  });
-};
-
-export const getposts = async (req, res, next) => {
+// Read
+export const getPosts = async (req, res, next) => {
   try {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9;
@@ -95,6 +96,22 @@ export const getposts = async (req, res, next) => {
       totalPosts,
       lastMonthPosts,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete
+
+export const deletePost = async (req, res, next) => {
+  console.log("req in deletePost", req);
+  if (!req.user.isAdmin && !req.user.id == req.params.userId) {
+    return next(createError(403, "You are not allowed to delete a post"));
+  }
+
+  try {
+    await Post.findByIdAndDelete(req.params.postId);
+    res.status(200).json("The post has been deleted");
   } catch (error) {
     next(error);
   }
