@@ -1,4 +1,5 @@
 import api from '@/api/axiosInstance';
+import CallToAction from '@/components/common/CallToAction';
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -42,9 +43,12 @@ export default function PostPage() {
 				<span className="italic">{post && (post.content.length / 1000).toFixed(0)} mins read</span>
 			</div>
 			<div
-				className="post-content md:break-word mx-auto w-full max-w-2xl p-3 break-normal wrap-normal md:wrap-break-word"
+				className="post-content break-word mx-auto w-full max-w-2xl p-3 wrap-break-word"
 				dangerouslySetInnerHTML={{ __html: post && post.content }}
 			></div>
+			<div className="mx-auto w-full max-w-4xl">
+				<CallToAction />
+			</div>
 		</main>
 	);
 }
