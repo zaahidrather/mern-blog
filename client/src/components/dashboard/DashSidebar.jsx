@@ -54,7 +54,7 @@ export default function DashSidebar() {
 				{currentUser.isAdmin && (
 					<Link
 						to="/dashboard?tab=users"
-						className={`flex gap-2 rounded px-4 py-2 ${isActive('posts')}`}
+						className={`flex gap-2 rounded px-4 py-2 ${isActive('users')}`}
 					>
 						<UsersRound /> Users
 					</Link>

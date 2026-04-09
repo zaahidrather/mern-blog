@@ -13,6 +13,7 @@ export const test = (req, res) => {
   });
 };
 
+// Update
 export const updateProfile = async (req, res, next) => {
   const updateData = {};
 
@@ -107,8 +108,9 @@ export const updateProfile = async (req, res, next) => {
   }
 };
 
+// Delete
 export const deleteUser = async (req, res, next) => {
-  if (req.user.id !== req.params.userId) {
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
     return next(createError(403, "You are not allowed to delete this user"));
   }
 
@@ -132,6 +134,7 @@ export const deleteUser = async (req, res, next) => {
   }
 };
 
+// Signout
 export const signout = (req, res, next) => {
   try {
     res
@@ -143,6 +146,7 @@ export const signout = (req, res, next) => {
   }
 };
 
+// Read
 export const getUsers = async (req, res, next) => {
   try {
     const startIndex = parseInt(req.query.startIndex) || 0;

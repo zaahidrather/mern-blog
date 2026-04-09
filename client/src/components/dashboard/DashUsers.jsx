@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
@@ -21,10 +20,11 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Trash2Icon } from 'lucide-react';
+import { Check, CircleX, Trash2Icon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import api from '@/api/axiosInstance';
 
-export default function DashPosts() {
+export default function DashUsers() {
 	const { currentUser } = useSelector((state) => state.user);
 	const [users, setUsers] = useState([]);
 	const [showMore, setShowMore] = useState(true);
@@ -32,44 +32,48 @@ export default function DashPosts() {
 	useEffect(() => {
 		async function fetchUsers() {
 			try {
-				const res = await axios.get('/api/users/getusers');
-				setUsers(res.data.users);
-				if (res.data.users.length < 9) {
+				const res = await api.get('/user/getusers');
+				// const { usersWithoutPassword, totalUsers, lastMonthUsers } = res.data;
+				const { usersWithoutPassword: fetchedUsers } = res.data;
+				// console.log('res', res);
+				setUsers(fetchedUsers);
+				if (res.data.usersWithoutPassword.length < 9) {
 					setShowMore(false);
 				}
 			} catch (error) {
 				console.error(error.message);
 			}
 		}
-		if (currentUser?._id) {
+		if (currentUser?.isAdmin) {
 			fetchUsers();
 		}
-	}, [currentUser._id]);
+	}, [currentUser?._id, currentUser?.isAdmin]);
 
-	// Show more posts
+	// Show more users
 	async function handleShowMore() {
 		const startIndex = users.length;
-		const res = await axios.get(`/api/user/getusers?startIndex=${startIndex}`);
+		const res = await api.get(`/user/getusers?startIndex=${startIndex}`);
 		setUsers((prev) => [...prev, ...res.data.users]);
 		if (res.data.users.length < 9) {
 			setShowMore(false);
 		}
 	}
 
-	// Delete post
-	async function handleDelete(postId) {
-		const deletePromise = axios.delete(`/api/post/deletepost/${postId}/${currentUser._id}`);
+	// Delete user
+	async function handleDelete(userId) {
+		const deletePromise = api.delete(`/user/delete/${userId}`);
 
 		toast.promise(deletePromise, {
-			loading: 'Deleting post...',
+			loading: 'Deleting user...',
 			success: () => {
 				// Update the UI state after success
-				setUsers((prev) => prev.filter((post) => post._id !== postId));
-				return 'Post deleted successfully!';
+				setUsers((prev) => prev.filter((user) => user._id !== userId));
+				return 'User deleted successfully!';
 			},
-			error: (err) => err.response?.data?.message || 'Could not delete post.',
+			error: (err) => err.response?.data?.message || 'Could not delete the user.',
 		});
 	}
+	// return <h1>hello</h1>;
 
 	return (
 		<div className="w-full overflow-x-auto p-3">
@@ -109,7 +113,7 @@ export default function DashPosts() {
 										{user.isAdmin ? (
 											<Check className="text-green-500" />
 										) : (
-											<CircleX className="text-red-500" />
+											<CircleX className="text-red-700" />
 										)}
 									</TableCell>
 
