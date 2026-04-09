@@ -33,7 +33,6 @@ export default function DashUsers() {
 		async function fetchUsers() {
 			try {
 				const res = await api.get('/user/getusers');
-				// const { usersWithoutPassword, totalUsers, lastMonthUsers } = res.data;
 				const { usersWithoutPassword: fetchedUsers } = res.data;
 				// console.log('res', res);
 				setUsers(fetchedUsers);

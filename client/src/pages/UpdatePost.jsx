@@ -45,8 +45,6 @@ export default function UpdatePost() {
 	// console.log('user', currentUser);
 	// const navigate = useNavigate();
 	const { postId } = useParams();
-	// console.log('postid', postId);
-	// console.log('userid', currentUser._id);
 
 	useEffect(() => {
 		async function fetchPost() {

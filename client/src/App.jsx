@@ -9,6 +9,7 @@ import Home from './pages/Home.jsx';
 import ProtectedRoute from './components/common/ProtectedRoute.jsx';
 import AuthRoute from './components/common/AuthRoute.jsx';
 import AdminRoute from './components/common/AdminRoute.jsx';
+import Loader from './components/common/Loader.jsx';
 
 // Lazy Loaded Routes (Split into separate chunks)
 const About = lazy(() => import('./pages/About.jsx'));
@@ -18,6 +19,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const Projects = lazy(() => import('./pages/Projects.jsx'));
 const CreatePost = lazy(() => import('./pages/CreatePost.jsx'));
 const UpdatePost = lazy(() => import('./pages/UpdatePost.jsx'));
+const PostPage = lazy(() => import('./pages/PostPage.jsx'));
 
 function App() {
 	const router = createBrowserRouter([
@@ -35,6 +37,10 @@ function App() {
 				{
 					path: '/projects',
 					Component: Projects,
+				},
+				{
+					path: '/post/:postSlug',
+					Component: PostPage,
 				},
 				{
 					Component: AuthRoute,
@@ -76,13 +82,7 @@ function App() {
 	]);
 
 	return (
-		<Suspense
-			fallback={
-				<div className="flex h-screen animate-pulse items-center justify-center text-4xl text-red-400">
-					Loading...
-				</div>
-			}
-		>
+		<Suspense fallback={<Loader />}>
 			<RouterProvider router={router} />
 		</Suspense>
 	);
