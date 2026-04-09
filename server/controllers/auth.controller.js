@@ -193,7 +193,7 @@ export const refreshToken = async (req, res, next) => {
     const accessToken = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin },
       process.env.JWT_ACCESS_SECRET,
-      { expiresIn: "15s" },
+      { expiresIn: "15m" },
     );
 
     // 5. Send new access token as cookie

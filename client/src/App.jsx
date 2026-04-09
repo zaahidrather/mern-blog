@@ -17,6 +17,7 @@ const SignIn = lazy(() => import('./pages/SignIn.jsx'));
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const Projects = lazy(() => import('./pages/Projects.jsx'));
 const CreatePost = lazy(() => import('./pages/CreatePost.jsx'));
+const UpdatePost = lazy(() => import('./pages/UpdatePost.jsx'));
 
 function App() {
 	const router = createBrowserRouter([
@@ -63,6 +64,10 @@ function App() {
 						{
 							path: '/create-post',
 							Component: CreatePost,
+						},
+						{
+							path: '/update-post/:postId',
+							Component: UpdatePost,
 						},
 					],
 				},

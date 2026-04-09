@@ -6,6 +6,7 @@ import {
   deletePost,
   generateSignature,
   getPosts,
+  updatePost,
 } from "../controllers/post.controller.js";
 
 const router = express.Router();
@@ -13,6 +14,7 @@ const router = express.Router();
 router.post("/create", verifyUser, isAdmin, create);
 router.get("/sign-upload", verifyUser, generateSignature);
 router.get("/getposts", getPosts);
+router.patch("/updatepost/:postId/:userId", verifyUser, isAdmin, updatePost);
 router.delete("/deletepost/:postId/:userId", verifyUser, deletePost);
 
 export default router;

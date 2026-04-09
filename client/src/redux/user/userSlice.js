@@ -10,6 +10,7 @@ const userSlice = createSlice({
 	name: 'user',
 	initialState,
 	reducers: {
+		// --------------------------------- Auth ----------------------------
 		signInStart: (state) => {
 			console.log('sign in start');
 			state.loading = true;
@@ -29,6 +30,7 @@ const userSlice = createSlice({
 			state.loading = false;
 			state.error = action.payload;
 		},
+		// --------------------------------- User ----------------------------
 		updateProfileStart: (state) => {
 			console.log('update profile start');
 			state.loading = true;
@@ -73,6 +75,12 @@ const userSlice = createSlice({
 			state.loading = false;
 			state.error = null;
 		},
+		// --------------------------------- Posts ----------------------------
+		updatePostFailure: (state, action) => {
+			console.log('Update post failure');
+			state.loading = false;
+			state.error = action.payload;
+		},
 	},
 });
 
@@ -88,6 +96,7 @@ export const {
 	deleteUserSuccess,
 	deleteUserFailure,
 	signoutSuccess,
+	updatePostFailure,
 } = userSlice.actions;
 
 export default userSlice.reducer;

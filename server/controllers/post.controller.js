@@ -101,8 +101,28 @@ export const getPosts = async (req, res, next) => {
   }
 };
 
-// Delete
+// Update
+export const updatePost = async (req, res, next) => {
+  // Block user only , if they're not admin or owner of post
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
+    return next(createError(403, "You are not allowed to update a post"));
+  }
+  const postId = req.params.postId;
 
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      { _id: postId },
+      { $set: req.body },
+      { new: true },
+    );
+
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete
 export const deletePost = async (req, res, next) => {
   console.log("req in deletePost", req);
   if (!req.user.isAdmin && !req.user.id == req.params.userId) {
