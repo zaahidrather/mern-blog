@@ -5,6 +5,7 @@ import {
   deleteUser,
   signout,
   getUsers,
+  getUser,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middlewares.js";
 import verifyUser from "../middlewares/verifyUser.js";
@@ -20,7 +21,8 @@ router.patch(
   updateProfile,
 );
 router.delete("/delete/:userId", verifyUser, deleteUser);
-router.get("/getusers", verifyUser, isAdmin, getUsers);
 router.post("/signout", signout);
+router.get("/getusers", verifyUser, isAdmin, getUsers);
+router.get("/:userId", getUser);
 
 export default router;

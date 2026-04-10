@@ -1,17 +1,31 @@
 import api from '@/api/axiosInstance';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import { Field, FieldError } from '../ui/field';
+import Comment from './Comment';
 
 export default function CommentSection({ postId }) {
 	const { currentUser } = useSelector((state) => state.user);
 	const [comment, setComment] = useState('');
+	const [comments, setComments] = useState([]);
 	const [commentError, setCommentError] = useState(null);
 	const CHARACTER_LIMIT = 200;
-	const isInvalid = comment.length == CHARACTER_LIMIT;
+	const isInvalid = comment.length >= CHARACTER_LIMIT;
+
+	useEffect(() => {
+		const getComments = async () => {
+			try {
+				const res = await api.get(`/comment/getPostComments/${postId}`);
+				setComments(res.data);
+			} catch (error) {
+				console.log(error.message);
+			}
+		};
+		getComments();
+	}, [postId]);
 
 	const handleChange = (e) => {
 		const newValue = e.target.value;
@@ -36,9 +50,10 @@ export default function CommentSection({ postId }) {
 		try {
 			const res = await api.post('/comment/create', commentData);
 
-			console.log('res', res);
-			setComment('');
+			console.log('res from creating comment', res);
+			setComment(''); // Clear comment form
 			setCommentError(null);
+			setComments([res.data, ...comments]); // Add newly created comment to existing state of post comments
 		} catch (error) {
 			setCommentError(error.message);
 		}
@@ -86,6 +101,21 @@ export default function CommentSection({ postId }) {
 						<Button type="submit">Submit</Button>
 					</div>
 				</form>
+			)}
+			{comments?.length === 0 ? (
+				<p className="my-5 text-sm">No comments yet!</p>
+			) : (
+				<>
+					<div className="my-5 flex items-center gap-1 text-sm">
+						<p>Comments</p>
+						<div className="rounded-sm border border-gray-400 px-2 py-1">
+							<p>{comments?.length}</p>
+						</div>
+					</div>
+					{comments?.map((comment) => (
+						<Comment key={comment._id} comment={comment} />
+					))}
+				</>
 			)}
 		</div>
 	);
