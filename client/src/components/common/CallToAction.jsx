@@ -40,10 +40,10 @@ export default function CallToAction() {
 			{/* Right Column: Aesthetic Radial Design */}
 			<div className="relative flex-1 self-stretch overflow-hidden bg-slate-900">
 				{/* Concentric Circles mimicking your reference image */}
-				<div className="absolute top-1/2 -right-20 h-[500px] w-[500px] -translate-y-1/2 rounded-full border-[1px] border-teal-500/20" />
-				<div className="absolute top-1/2 -right-10 h-[400px] w-[400px] -translate-y-1/2 rounded-full border-[1px] border-teal-500/15" />
-				<div className="absolute top-1/2 right-0 h-[300px] w-[300px] -translate-y-1/2 rounded-full border-[1px] border-teal-500/10" />
-				<div className="absolute top-1/2 right-10 h-[200px] w-[200px] -translate-y-1/2 rounded-full border-[1px] border-teal-500/5" />
+				<div className="absolute top-1/2 -right-20 h-[500px] w-[500px] -translate-y-1/2 rounded-full border border-teal-500/20" />
+				<div className="absolute top-1/2 -right-10 h-[400px] w-[400px] -translate-y-1/2 rounded-full border border-teal-500/15" />
+				<div className="absolute top-1/2 right-0 h-[300px] w-[300px] -translate-y-1/2 rounded-full border border-teal-500/10" />
+				<div className="absolute top-1/2 right-10 h-[200px] w-[200px] -translate-y-1/2 rounded-full border border-teal-500/5" />
 
 				{/* Glowing Core */}
 				<div className="absolute top-1/2 -right-10 h-32 w-32 -translate-y-1/2 rounded-full bg-teal-500/20 blur-3xl" />

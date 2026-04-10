@@ -3,12 +3,13 @@ import Header from '@/components/common/Header';
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-import { Outlet } from 'react-router-dom';
+import { Outlet, ScrollRestoration } from 'react-router-dom';
 
 export default function Root() {
 	const theme = useSelector((state) => state.theme.mode);
 	return (
 		<>
+			<ScrollRestoration />
 			<Header />
 			<Toaster
 				toastOptions={{

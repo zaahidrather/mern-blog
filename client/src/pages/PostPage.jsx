@@ -1,5 +1,6 @@
 import api from '@/api/axiosInstance';
 import CallToAction from '@/components/common/CallToAction';
+import CommentsSection from '@/components/dashboard/CommentsSection';
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -14,7 +15,7 @@ export default function PostPage() {
 				const res = await api.get(`/post/getposts?slug=${postSlug}`);
 				const fetchedPost = res.data.posts[0];
 				setPost(fetchedPost);
-				console.log('fetchedpost', fetchedPost);
+				// console.log('fetchedpost', fetchedPost);
 			} catch (error) {
 				console.error(error.message);
 			}
@@ -49,6 +50,7 @@ export default function PostPage() {
 			<div className="mx-auto w-full max-w-4xl">
 				<CallToAction />
 			</div>
+			<CommentsSection postId={post?._id} />
 		</main>
 	);
 }
