@@ -7,7 +7,8 @@ const commentSchema = new mongoose.Schema(
       required: true,
     },
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId, // Mongoose now knows this is a pointer
+      ref: "User", // This tells Mongoose which collection to look in
       required: true,
     },
     postId: {

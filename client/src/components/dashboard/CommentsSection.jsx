@@ -6,6 +6,7 @@ import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import { Field, FieldError } from '../ui/field';
 import Comment from './Comment';
+import { useNavigate } from 'react-router-dom';
 
 export default function CommentSection({ postId }) {
 	const { currentUser } = useSelector((state) => state.user);
@@ -15,11 +16,14 @@ export default function CommentSection({ postId }) {
 	const CHARACTER_LIMIT = 200;
 	const isInvalid = comment.length >= CHARACTER_LIMIT;
 
+	const navigate = useNavigate();
+
 	useEffect(() => {
 		const getComments = async () => {
 			try {
 				const res = await api.get(`/comment/getPostComments/${postId}`);
 				setComments(res.data);
+				// console.log('comments', res.data);
 			} catch (error) {
 				console.log(error.message);
 			}
@@ -50,12 +54,43 @@ export default function CommentSection({ postId }) {
 		try {
 			const res = await api.post('/comment/create', commentData);
 
+			// Create a version of the comment that matches the "populated" structure
+			const newCommentPopulated = {
+				...res.data,
+				userId: {
+					_id: currentUser._id,
+					username: currentUser.username,
+					avatar: {
+						secure_url: currentUser.avatar.secure_url,
+					},
+				},
+			};
 			console.log('res from creating comment', res);
 			setComment(''); // Clear comment form
 			setCommentError(null);
-			setComments([res.data, ...comments]); // Add newly created comment to existing state of post comments
+			setComments([newCommentPopulated, ...comments]); // Add newly created comment to existing state of post comments
 		} catch (error) {
 			setCommentError(error.message);
+		}
+	};
+
+	const handleLike = async (commentId) => {
+		if (!currentUser) {
+			navigate('/sign-in');
+			return;
+		}
+
+		try {
+			const res = await api.put(`/comment/likecomment/${commentId}`);
+			setComments(
+				comments.map((comment) =>
+					comment._id == commentId
+						? { ...comment, likes: res.data.likes, numberOfLikes: res.data.numberOfLikes }
+						: comment,
+				),
+			);
+		} catch (error) {
+			console.log(error);
 		}
 	};
 	return (
@@ -113,7 +148,7 @@ export default function CommentSection({ postId }) {
 						</div>
 					</div>
 					{comments?.map((comment) => (
-						<Comment key={comment._id} comment={comment} />
+						<Comment key={comment._id} comment={comment} onLike={handleLike} />
 					))}
 				</>
 			)}
