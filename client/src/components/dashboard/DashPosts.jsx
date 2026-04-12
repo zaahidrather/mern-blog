@@ -82,22 +82,20 @@ export default function DashPosts() {
 						{/* <TableCaption>Caption here.</TableCaption> */}
 						<TableHeader>
 							<TableRow>
-								<TableHead>Date updated</TableHead>
+								<TableHead className="pl-10">Date updated</TableHead>
 								<TableHead>Post image</TableHead>
 								<TableHead>Post title</TableHead>
 								<TableHead>Category</TableHead>
 								<TableHead>Delete</TableHead>
-								<TableHead className="text-right">
-									<span className="sr-only">Edit</span>{' '}
-									{/* sr-only keeps it accessible but invisible if you prefer the clean look */}
-									Edit
+								<TableHead className="">
+									<span className="sr-only">Edit</span> Edit
 								</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
 							{posts.map((post) => (
 								<TableRow key={post._id}>
-									<TableCell className="font-medium">
+									<TableCell className="pl-10">
 										{new Date(post.updatedAt).toLocaleDateString()}
 									</TableCell>
 
@@ -152,7 +150,7 @@ export default function DashPosts() {
 										</AlertDialog>
 									</TableCell>
 
-									<TableCell className="text-right">
+									<TableCell>
 										<Link className="text-teal-500 hover:underline" to={`/update-post/${post._id}`}>
 											Edit
 										</Link>

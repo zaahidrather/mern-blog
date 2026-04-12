@@ -22,7 +22,7 @@ import { Spinner } from '@/components/ui/spinner';
 import api from '@/api/axiosInstance';
 // import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { updatePostFailure, clearError } from '@/redux/user/userSlice';
 
 export default function UpdatePost() {
@@ -44,7 +44,7 @@ export default function UpdatePost() {
 	const dispatch = useDispatch();
 	const { currentUser, error: errorMessage } = useSelector((state) => state.user);
 	// console.log('user', currentUser);
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 	const { postId } = useParams();
 
 	useEffect(() => {
@@ -63,9 +63,6 @@ export default function UpdatePost() {
 					category: post.category,
 					image: post.image,
 				});
-				// if (res.data.posts.length < 9) {
-				// 	setShowMore(false);
-				// }
 			} catch (error) {
 				console.error(error.message);
 			}
@@ -165,11 +162,11 @@ export default function UpdatePost() {
 		try {
 			setUploadError(null);
 			setPublishError(null);
-			// console.log('inside submit dataToSend', dataToSend);
-			// console.log('inside submit originalPost', originalPost);
-			// console.log('inside submit postData', postData);
 
-			await api.patch(`/post/updatepost/${postId}/${currentUser._id}`, dataToSend);
+			const updatedPost = await api.patch(
+				`/post/updatepost/${postId}/${currentUser._id}`,
+				dataToSend,
+			);
 			toast.success('Post updated successfully!');
 			setPostData({
 				title: '',
@@ -177,7 +174,8 @@ export default function UpdatePost() {
 				image: null,
 				category: 'uncategorized',
 			});
-			// navigate(`/post/${slug}`);
+
+			navigate(`/post/${updatedPost.data.slug}`);
 		} catch (error) {
 			if (error.response) {
 				// The server responded with a status outside 2xx (e.g., 400, 403, 500)

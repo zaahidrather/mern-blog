@@ -19,7 +19,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const Projects = lazy(() => import('./pages/Projects.jsx'));
 const CreatePost = lazy(() => import('./pages/CreatePost.jsx'));
 const UpdatePost = lazy(() => import('./pages/UpdatePost.jsx'));
-const PostPage = lazy(() => import('./pages/PostPage.jsx'));
+const PostsPage = lazy(() => import('./pages/PostsPage.jsx'));
 
 function App() {
 	const router = createBrowserRouter([
@@ -40,7 +40,7 @@ function App() {
 				},
 				{
 					path: '/post/:postSlug',
-					Component: PostPage,
+					Component: PostsPage,
 				},
 				{
 					Component: AuthRoute,

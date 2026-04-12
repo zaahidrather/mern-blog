@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import logo_1 from '@/assets/logo_1.png';
+
 import { Facebook, Instagram, Twitter, Github, Dribbble } from 'lucide-react';
 
 export default function Footer() {
@@ -10,12 +12,9 @@ export default function Footer() {
 					{/* Brand */}
 					<Link
 						to="/"
-						className="text-lg font-semibold whitespace-nowrap sm:text-xl dark:text-white"
+						className="self-center text-sm font-semibold whitespace-nowrap md:text-base dark:text-white"
 					>
-						<span className="rounded-lg bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 px-2 py-1 text-white">
-							Zahid&apos;s
-						</span>{' '}
-						Blog
+						<img src={logo_1} className="h-10" alt="Logo" />
 					</Link>
 
 					{/* Links */}

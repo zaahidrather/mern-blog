@@ -1,3 +1,5 @@
+import logo_1 from '@/assets/logo_1.png';
+import logo_2 from '@/assets/logo_2.png';
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
@@ -56,14 +58,15 @@ export default function Header() {
 					isOpen ? 'border-b-0' : 'border-b-2'
 				} px-4 py-2.5 lg:px-6`}
 			>
+				{/* <span className="rounded-lg bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 px-2 py-1 text-white">
+					Zahid's
+				</span>
+				Blog */}
 				<Link
 					to="/"
 					className="self-center text-sm font-semibold whitespace-nowrap md:text-base dark:text-white"
 				>
-					<span className="rounded-lg bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 px-2 py-1 text-white">
-						Zahid's
-					</span>
-					Blog
+					<img src={logo_1} className="h-10" alt="Logo" />
 				</Link>
 				<form>
 					<div className="relative hidden lg:inline-block">

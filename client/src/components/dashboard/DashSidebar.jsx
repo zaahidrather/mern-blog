@@ -30,7 +30,7 @@ export default function DashSidebar() {
 	}
 
 	return (
-		<aside className="h-screen w-64 border border-white p-4">
+		<aside className="h-screen w-64 p-4">
 			<h2 className="mb-6 text-xl font-semibold">Dashboard</h2>
 
 			<nav className="space-y-2">

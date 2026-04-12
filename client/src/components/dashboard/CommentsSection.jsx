@@ -187,11 +187,10 @@ export default function CommentSection({ postId }) {
 				<p className="my-5 text-sm">No comments yet!</p>
 			) : (
 				<>
-					<div className="my-5 flex items-center gap-1 text-sm">
-						<p>Comments</p>
-						<div className="rounded-sm border border-gray-400 px-2 py-1">
-							<p>{comments?.length}</p>
-						</div>
+					<div className="my-5 flex items-center gap-1 text-sm font-semibold">
+						<p>
+							Comments <span className="text-xs font-medium">{comments?.length}</span>
+						</p>
 					</div>
 					{comments?.map((comment) => (
 						<Comment

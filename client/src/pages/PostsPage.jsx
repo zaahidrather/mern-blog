@@ -1,5 +1,6 @@
 import api from '@/api/axiosInstance';
 import CallToAction from '@/components/common/CallToAction';
+import PostCard from '@/components/common/PostCard';
 import CommentsSection from '@/components/dashboard/CommentsSection';
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
@@ -8,7 +9,9 @@ import { Link, useParams } from 'react-router-dom';
 export default function PostPage() {
 	const { postSlug } = useParams();
 	const [post, setPost] = useState(null);
+	const [recentPosts, setRecentPosts] = useState(null);
 
+	// Fetch posts
 	useEffect(() => {
 		async function fetchPost() {
 			try {
@@ -23,6 +26,22 @@ export default function PostPage() {
 
 		fetchPost();
 	}, [postSlug]);
+
+	// Fetch recent posts
+	useEffect(() => {
+		try {
+			const fetchRecentPosts = async () => {
+				const res = await fetch(`/api/post/getposts?limit=3`);
+				const data = await res.json();
+				if (res.ok) {
+					setRecentPosts(data.posts);
+				}
+			};
+			fetchRecentPosts();
+		} catch (error) {
+			console.log(error.message);
+		}
+	}, []);
 
 	return (
 		<main className="mx-auto flex min-h-screen max-w-6xl flex-col p-3">
@@ -51,6 +70,12 @@ export default function PostPage() {
 				<CallToAction />
 			</div>
 			<CommentsSection postId={post?._id} />
+			<div className="mb-5 flex flex-col items-center justify-center">
+				<h1 className="mt-5 text-xl">Recent articles</h1>
+				<div className="mt-5 flex flex-wrap justify-center gap-5">
+					{recentPosts && recentPosts.map((post) => <PostCard key={post._id} post={post} />)}
+				</div>
+			</div>
 		</main>
 	);
 }
