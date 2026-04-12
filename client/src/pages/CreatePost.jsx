@@ -20,7 +20,7 @@ import { AlertCircleIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Spinner } from '@/components/ui/spinner';
 import api from '@/api/axiosInstance';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreatePost() {
 	const filePickerRef = useRef();
@@ -36,7 +36,7 @@ export default function CreatePost() {
 		image: null,
 		category: 'uncategorized',
 	});
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 
 	async function handleImage() {
 		const file = selectedFile;
@@ -104,6 +104,7 @@ export default function CreatePost() {
 
 			await api.post('/post/create', postData);
 			toast.success('Post published successfully!');
+			navigate('/dashboard?tab=posts');
 			setPostData({
 				title: '',
 				content: '',

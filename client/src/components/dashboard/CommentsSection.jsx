@@ -17,7 +17,6 @@ import {
 	AlertDialogHeader,
 	AlertDialogMedia,
 	AlertDialogTitle,
-	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Trash2Icon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -48,6 +47,7 @@ export default function CommentSection({ postId }) {
 	}, [postId]);
 
 	const handleChange = (e) => {
+		setCommentError('');
 		const newValue = e.target.value;
 		// Only update state if the new length is within limits
 		if (newValue.length <= CHARACTER_LIMIT) {
@@ -58,6 +58,10 @@ export default function CommentSection({ postId }) {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (comment.length > 200) {
+			return;
+		}
+		if (comment.length == 0) {
+			setCommentError('Please enter something first.');
 			return;
 		}
 
@@ -169,14 +173,17 @@ export default function CommentSection({ postId }) {
 							onChange={handleChange}
 							value={comment}
 						/>
-						{commentError && <FieldError className="text-destructive">{commentError}</FieldError>}
 					</Field>
 					<div className="mt-5 flex items-center justify-between">
-						<p
-							className={`text-xs ${comment.length === CHARACTER_LIMIT ? 'text-destructive ' : 'text-gray-500'}`}
-						>
-							{CHARACTER_LIMIT - comment.length} characters remaining
-						</p>
+						{commentError ? (
+							<FieldError className="text-destructive">{commentError}</FieldError>
+						) : (
+							<p
+								className={`text-xs ${comment.length === CHARACTER_LIMIT ? 'text-destructive ' : 'text-gray-500'}`}
+							>
+								{CHARACTER_LIMIT - comment.length} characters remaining
+							</p>
+						)}
 						<Button type="submit">Submit</Button>
 					</div>
 				</form>

@@ -1,5 +1,5 @@
 import { signoutSuccess } from '@/redux/user/userSlice';
-import { ArrowRight, FileText, User, UsersRound } from 'lucide-react';
+import { ArrowRight, FileText, MessageSquareText, User, UsersRound } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -57,6 +57,14 @@ export default function DashSidebar() {
 						className={`flex gap-2 rounded px-4 py-2 ${isActive('users')}`}
 					>
 						<UsersRound /> Users
+					</Link>
+				)}
+				{currentUser.isAdmin && (
+					<Link
+						to="/dashboard?tab=comments"
+						className={`flex gap-2 rounded px-4 py-2 text-sm ${isActive('comments')}`}
+					>
+						<MessageSquareText /> Comments
 					</Link>
 				)}
 				<button

@@ -50,7 +50,7 @@ export default function PostPage() {
 			</h1>
 			<Link to={`/search?category=${post && post.category}`} className="mt-5 self-center">
 				<Button color="gray" size="xs">
-					{post && post.category}
+					{post && `${post.category.charAt(0).toUpperCase()}${post.category.slice(1)}`}
 				</Button>
 			</Link>
 			<img

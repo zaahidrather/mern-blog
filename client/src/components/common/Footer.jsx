@@ -5,7 +5,7 @@ import { Facebook, Instagram, Twitter, Github, Dribbble } from 'lucide-react';
 
 export default function Footer() {
 	return (
-		<footer className="border-t-8 border-[#0e7490]">
+		<footer className="mt-8">
 			<div className="mx-auto max-w-7xl px-4 py-8">
 				{/* Top */}
 				<div className="flex flex-col gap-10 sm:flex-row sm:justify-between">

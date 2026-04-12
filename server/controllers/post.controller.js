@@ -1,3 +1,4 @@
+import Comment from "../models/comment.model.js";
 import Post from "../models/post.model.js";
 import { createError } from "../utils/error.js";
 import { v2 as cloudinary } from "cloudinary";
@@ -131,6 +132,9 @@ export const deletePost = async (req, res, next) => {
 
   try {
     await Post.findByIdAndDelete(req.params.postId);
+    // Delete all comments of this post
+    // const commentsData = await Comment.find({user:req.params.user})
+    // res.status(200).json("The comments resullt",commentsData);
     res.status(200).json("The post has been deleted");
   } catch (error) {
     next(error);

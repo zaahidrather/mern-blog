@@ -10,6 +10,7 @@ import ProtectedRoute from './components/common/ProtectedRoute.jsx';
 import AuthRoute from './components/common/AuthRoute.jsx';
 import AdminRoute from './components/common/AdminRoute.jsx';
 import Loader from './components/common/Loader.jsx';
+import NotFound from './pages/NotFound.jsx';
 
 // Lazy Loaded Routes (Split into separate chunks)
 const About = lazy(() => import('./pages/About.jsx'));
@@ -76,6 +77,10 @@ function App() {
 							Component: UpdatePost,
 						},
 					],
+				},
+				{
+					path: '*',
+					Component: NotFound,
 				},
 			],
 		},
