@@ -31,7 +31,7 @@ export default function Header() {
 	const isActive = (href) =>
 		`  px-3 py-2 text-sm font-semibold transition-colors ${
 			pathname === href
-				? ' text-white bg-[#0e7490]'
+				? ' text-black rounded bg-[#00d5be]'
 				: 'text-muted-foreground  hover:text-foreground'
 		}`;
 
