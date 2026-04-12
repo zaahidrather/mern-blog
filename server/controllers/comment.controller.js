@@ -6,6 +6,10 @@ export const createComment = async (req, res, next) => {
   try {
     const { content, postId, user } = req.body;
 
+    if (!content) {
+      return next(createError(400, "Please provide all required fields"));
+    }
+
     if (user !== req.user.id) {
       return next(
         createError(403, "You are not allowed to create this comment"),

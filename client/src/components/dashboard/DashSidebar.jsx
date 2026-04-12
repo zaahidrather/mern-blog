@@ -1,5 +1,12 @@
 import { signoutSuccess } from '@/redux/user/userSlice';
-import { ArrowRight, FileText, MessageSquareText, User, UsersRound } from 'lucide-react';
+import {
+	ArrowRight,
+	FileText,
+	MessageSquareText,
+	PanelsTopLeft,
+	User,
+	UsersRound,
+} from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -11,7 +18,7 @@ export default function DashSidebar() {
 	const dispatch = useDispatch();
 	const { currentUser } = useSelector((state) => state.user);
 
-	const isActive = (tab) => (tab == activeTab ? 'bg-gray-500' : '');
+	const isActive = (tab) => (tab == activeTab ? 'bg-slate-300 dark:bg-slate-800' : '');
 
 	async function handleSignout() {
 		try {
@@ -30,10 +37,18 @@ export default function DashSidebar() {
 	}
 
 	return (
-		<aside className="h-screen w-64 p-4">
-			<h2 className="mb-6 text-xl font-semibold">Dashboard</h2>
+		<aside className="h-screen w-64 border border-white p-4">
+			{/* <h2 className="mb-6 text-xl font-semibold">Dashboard</h2> */}
 
 			<nav className="space-y-2">
+				{currentUser.isAdmin && (
+					<Link
+						to="/dashboard?tab=home"
+						className={`flex gap-2 rounded px-4 py-2 ${isActive('home')}`}
+					>
+						<PanelsTopLeft /> Dashboard
+					</Link>
+				)}
 				<Link
 					to="/dashboard?tab=profile"
 					className={`flex items-center gap-2 rounded px-4 py-2 ${isActive('profile')}`}

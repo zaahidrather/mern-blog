@@ -1,9 +1,10 @@
+import { useLocation } from 'react-router-dom';
 import DashSidebar from '@/components/dashboard/DashSidebar';
 import Profile from '@/components/dashboard/Profile';
 import DashPosts from '@/components/dashboard/DashPosts';
 import DashUsers from '@/components/dashboard/DashUsers';
-import { useLocation } from 'react-router-dom';
 import DashComments from '@/components/dashboard/DashComments';
+import DashHome from '@/components/dashboard/DashHome';
 
 export default function Dashboard() {
 	const location = useLocation();
@@ -12,15 +13,12 @@ export default function Dashboard() {
 	const tab = urlSearchParams.get('tab');
 
 	return (
-		<div className="flex border">
+		<div className="flex">
 			<DashSidebar />
-			{/* Profile */}
+			{tab == 'home' && <DashHome />}
 			{tab == 'profile' && <Profile />}
-			{/* Posts */}
 			{tab == 'posts' && <DashPosts />}
-			{/* Users */}
 			{tab == 'users' && <DashUsers />}
-			{/* Comments */}
 			{tab == 'comments' && <DashComments />}
 		</div>
 	);
