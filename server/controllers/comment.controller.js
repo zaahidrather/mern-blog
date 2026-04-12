@@ -4,9 +4,9 @@ import { createError } from "../utils/error.js";
 // Create
 export const createComment = async (req, res, next) => {
   try {
-    const { content, postId, userId } = req.body;
+    const { content, postId, user } = req.body;
 
-    if (userId !== req.user.id) {
+    if (user !== req.user.id) {
       return next(
         createError(403, "You are not allowed to create this comment"),
       );
@@ -15,7 +15,7 @@ export const createComment = async (req, res, next) => {
     const newComment = new Comment({
       content,
       postId,
-      userId,
+      user,
     });
 
     await newComment.save();
@@ -33,7 +33,7 @@ export const getPostComments = async (req, res, next) => {
       .sort({
         createdAt: -1,
       })
-      .populate("userId", "username avatar.secure_url");
+      .populate("user", "_id username avatar.secure_url");
 
     res.status(200).json(comments);
   } catch (error) {
@@ -64,4 +64,44 @@ export const likeComment = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+// Update
+export const editComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId.toString());
+
+    if (!comment) {
+      return next(createError(404, "Comment not found"));
+    }
+    if (comment.user.toString() !== req.user.id && !req.user.isAdmin) {
+      return next(createError(403, "You are not allowed to edit this comment"));
+    }
+
+    const editedComment = await Comment.findByIdAndUpdate(
+      req.params.commentId,
+      {
+        $set: { content: req.body.content },
+      },
+      { new: true },
+    );
+    res.status(200).json(editedComment);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete
+export const deleteComment = async (req, res, next) => {
+  const comment = await Comment.findById(req.params.commentId);
+
+  if (!comment) {
+    return next(createError(404, "Comment not found"));
+  }
+  if (comment.user._id !== req.user.id && !req.user.isAdmin) {
+    return next(createError(403, "You are not allowed to delete this comment"));
+  }
+
+  await Comment.findByIdAndDelete(req.params.commentId);
+  res.status(200).json("Comment has been deleted");
 };

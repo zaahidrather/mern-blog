@@ -40,6 +40,7 @@ export default function UpdatePost() {
 		image: null,
 		category: 'uncategorized',
 	});
+
 	const dispatch = useDispatch();
 	const { currentUser, error: errorMessage } = useSelector((state) => state.user);
 	// console.log('user', currentUser);
@@ -144,7 +145,7 @@ export default function UpdatePost() {
 
 		// Ensure originalPost exists before diffing
 		if (!originalPost) {
-			console.log('no original post');
+			console.log('No original post');
 			return;
 		}
 
