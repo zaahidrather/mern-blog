@@ -18,22 +18,14 @@ export default function CallToAction() {
 
 				<div className="mt-10 flex flex-wrap items-center gap-4">
 					{/* Primary Action */}
-					<Button className="group flex items-center gap-3 rounded-full bg-teal-500 px-8 py-3 font-bold text-slate-950 shadow-[0_0_20px_rgba(20,184,166,0.3)] transition-all hover:scale-105 hover:bg-teal-400">
-						<a href="https://react.dev" target="_blank" rel="noopener noreferrer">
-							Explore React Docs
-						</a>
-						<span className="inline-block transition-transform duration-300 group-hover:translate-x-1">
-							→
-						</span>
-					</Button>
-
-					{/* Secondary Action */}
-					<Button
-						variant="ghost"
-						className="rounded-full border border-slate-700 px-8 py-3 text-white transition-colors hover:bg-slate-800"
-					>
-						<Link to="/search?category=Development">View Roadmap</Link>
-					</Button>
+					<Link to="/search" className="group rounded-full bg-red-400">
+						<Button className="relative flex items-center gap-3 rounded-full bg-teal-500 px-8 py-3 font-bold text-slate-950 shadow-[0_0_20px_rgba(20,184,166,0.3)] transition-all hover:scale-105 hover:bg-teal-400">
+							View Articles
+							<span className="inline-block transition-transform duration-300 group-hover:translate-x-1">
+								→
+							</span>
+						</Button>
+					</Link>
 				</div>
 			</div>
 

@@ -38,7 +38,9 @@ export default function Home() {
 				<div className="mx-auto flex max-w-6xl flex-col gap-8 p-3 py-3">
 					{posts && posts.length > 0 && (
 						<div className="flex flex-col gap-6">
-							<h2 className="text-center text-2xl font-semibold">Recent Posts</h2>
+							<h2 className="text-center text-2xl font-semibold" id="recent-posts">
+								Recent Posts
+							</h2>
 							<div className="flex flex-wrap gap-3">
 								{posts.map((post) => (
 									<PostCard key={post._id} post={post} />
