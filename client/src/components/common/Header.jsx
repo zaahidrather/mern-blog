@@ -1,7 +1,6 @@
 import logo_1 from '@/assets/logo_1.png';
-import logo_2 from '@/assets/logo_2.png';
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Menu, Moon, Search, Sun } from 'lucide-react';
@@ -16,14 +15,27 @@ import {
 import { themeToggle } from '@/redux/theme/themeSlice';
 import { useDispatch } from 'react-redux';
 import { signoutSuccess } from '@/redux/user/userSlice';
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from '../ui/sheet';
+// import path from 'node:path';
 
 export default function Header() {
-	const { pathname } = useLocation();
 	const [isOpen, setIsOpen] = useState(false);
+	const [keyword, setKeyword] = useState('');
 
 	const dispatch = useDispatch();
 	const currentUser = useSelector((state) => state.user.currentUser);
 	const theme = useSelector((state) => state.theme.mode);
+
+	const navigate = useNavigate();
+	const location = useLocation();
+	const { pathname } = location;
 
 	// console.log('theme mode : ', theme);
 	// console.log('currentUser', currentUser);
@@ -51,6 +63,22 @@ export default function Header() {
 		}
 	}
 
+	useEffect(() => {
+		const searchParams = new URLSearchParams(location.search);
+		const keywordFromUrl = searchParams.get('keyword');
+
+		if (keywordFromUrl) {
+			setKeyword(keywordFromUrl);
+		}
+	}, [location.search]);
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		const searchParams = new URLSearchParams(location.search);
+		searchParams.set('keyword', keyword);
+		navigate(`/search?${searchParams.toString()}`);
+	};
+
 	return (
 		<header className="dark:bg-black">
 			<div
@@ -68,20 +96,55 @@ export default function Header() {
 				>
 					<img src={logo_1} className="h-10" alt="Logo" />
 				</Link>
-				<form>
-					<div className="relative hidden lg:inline-block">
-						<Input type="text" placeholder="Search..." className="pr-9" />
-						<Search className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+
+				{/* Search field tab , pc */}
+				<form onSubmit={handleSubmit}>
+					<div className="relative hidden sm:inline-block">
+						<Input
+							type="text"
+							value={keyword}
+							onChange={(e) => setKeyword(e.target.value)}
+							placeholder="Search..."
+							className="pr-9"
+						/>
+						<button
+							type="submit"
+							className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
+						>
+							<Search className="text-muted-foreground absolute top-1/2 right-0.5 h-4 w-4 -translate-y-1/2" />
+						</button>
 					</div>
 				</form>
 
-				<Button
-					variant="primary"
-					size="icon"
-					className="h-10 w-12 cursor-pointer rounded-full border lg:hidden"
-				>
-					<Search className="h-4 w-4" />
-				</Button>
+				{/* Search field - mobile */}
+				<Sheet>
+					<SheetTrigger asChild>
+						<Button
+							variant="primary"
+							size="icon"
+							className="h-10 w-12 cursor-pointer rounded-full border sm:hidden"
+						>
+							<Search className="h-4 w-4" />
+						</Button>
+					</SheetTrigger>
+					<SheetContent side="top" className="p-4 [&>button]:hidden">
+						<SheetHeader className="sr-only">
+							<SheetTitle>Search</SheetTitle>
+							<SheetDescription>Search the website content</SheetDescription>
+						</SheetHeader>
+						<form onSubmit={handleSubmit} className="flex gap-2 pt-4">
+							<Input
+								type="text"
+								autoFocus
+								value={keyword}
+								onChange={(e) => setKeyword(e.target.value)}
+								placeholder="Search..."
+								className="flex-1"
+							/>
+							<Button type="submit">Search</Button>
+						</form>
+					</SheetContent>
+				</Sheet>
 
 				<div className="flex items-center gap-2 md:order-2">
 					{/* Light / Dark mode button */}

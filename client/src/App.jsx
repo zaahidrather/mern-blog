@@ -21,6 +21,7 @@ const Projects = lazy(() => import('./pages/Projects.jsx'));
 const CreatePost = lazy(() => import('./pages/CreatePost.jsx'));
 const UpdatePost = lazy(() => import('./pages/UpdatePost.jsx'));
 const PostsPage = lazy(() => import('./pages/PostsPage.jsx'));
+const Search = lazy(() => import('./pages/Search.jsx'));
 
 function App() {
 	const router = createBrowserRouter([
@@ -30,6 +31,10 @@ function App() {
 				{
 					path: '/',
 					Component: Home,
+				},
+				{
+					path: '/search',
+					Component: Search,
 				},
 				{
 					path: '/about',

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThumbsUp } from 'lucide-react';
-import moment from 'moment';
+import { formatDistanceToNow } from 'date-fns';
 import { useSelector } from 'react-redux';
 import { Field, FieldError } from '../ui/field';
 import { Textarea } from '../ui/textarea';
@@ -51,7 +51,6 @@ export default function Comment({ comment, onLike, onEdit, handleOpenModal }) {
 			<div className="flex shrink-0 items-center gap-2">
 				<img
 					className="h-10 w-10 rounded-full bg-gray-200"
-					// Use the avatar object from your model
 					src={user?.avatar?.secure_url}
 					alt={user?.username}
 				/>
@@ -59,7 +58,9 @@ export default function Comment({ comment, onLike, onEdit, handleOpenModal }) {
 					<span className="mr-1 truncate text-xs font-bold">
 						{user ? `@${user.username}` : 'anonymous user'}
 					</span>
-					<span className="text-xs text-gray-500">{moment(comment.createdAt).fromNow()}</span>
+					<span className="text-xs text-gray-500">
+						{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+					</span>
 				</div>
 			</div>
 			<div className="flex-1">

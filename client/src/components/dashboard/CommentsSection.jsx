@@ -204,7 +204,7 @@ export default function CommentSection({ postId }) {
 							key={comment._id}
 							comment={comment}
 							setComment={setComment}
-							currentUserId={currentUser._id}
+							currentUserId={currentUser?._id}
 							onLike={handleLike}
 							onEdit={handleEdit}
 							handleOpenModal={handleOpenModal}

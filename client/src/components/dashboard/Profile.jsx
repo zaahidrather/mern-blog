@@ -30,6 +30,7 @@ import {
 import { Trash2Icon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import api from '@/api/axiosInstance';
 
 export default function Profile() {
 	const { currentUser, loading, error: errorMessage } = useSelector((state) => state.user);
@@ -104,7 +105,7 @@ export default function Profile() {
 			dispatch(updateProfileStart());
 
 			// 4. Axios Request
-			const res = await axios.patch(`/api/user/update/${currentUser._id}`, dataToSend);
+			const res = await api.patch(`/user/update/${currentUser._id}`, dataToSend);
 
 			// 5. Success Handling
 			dispatch(updateProfileSuccess(res.data));
@@ -140,7 +141,7 @@ export default function Profile() {
 		try {
 			dispatch(deleteUserStart());
 
-			await axios.delete(`/api/user/delete/${currentUser._id}`);
+			await api.delete(`/user/delete/${currentUser._id}`);
 
 			dispatch(deleteUserSuccess());
 		} catch (error) {
@@ -155,7 +156,7 @@ export default function Profile() {
 
 	async function handleSignout() {
 		try {
-			await axios.post('/api/user/signout');
+			await api.post('/user/signout');
 
 			// If the request is successful, the interceptor does nothing.
 			// We manually dispatch here for a intentional logout.

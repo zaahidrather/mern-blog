@@ -25,4 +25,16 @@ export default defineConfig({
 			'@': path.resolve(__dirname, './src'),
 		},
 	},
+	build: {
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					// Group the editor and its heavy dependencies together
+					'editor-vendor': ['react-quill-new', 'quill', 'lodash-es', 'quill-delta'],
+					// Group firebase auth separately
+					'firebase-vendor': ['firebase/auth', 'firebase/app'],
+				},
+			},
+		},
+	},
 });

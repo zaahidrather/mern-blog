@@ -20,7 +20,6 @@ import { AlertCircleIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Spinner } from '@/components/ui/spinner';
 import api from '@/api/axiosInstance';
-// import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { updatePostFailure, clearError } from '@/redux/user/userSlice';
@@ -175,7 +174,7 @@ export default function UpdatePost() {
 				category: 'uncategorized',
 			});
 
-			navigate(`/post/${updatedPost.data.slug}`);
+			navigate(`/dashboard?tab=posts`);
 		} catch (error) {
 			if (error.response) {
 				// The server responded with a status outside 2xx (e.g., 400, 403, 500)

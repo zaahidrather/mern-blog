@@ -33,11 +33,18 @@ export const create = async (req, res, next) => {
     return next(createError(400, "Please provide all required fields"));
   }
 
+  // const slug = req.body.title
+  //   .split(" ")
+  //   .join("-")
+  //   .toLowerCase()
+  //   .replace(/[^a-zA-Z0-9-]/g, "");
+
   const slug = req.body.title
-    .split(" ")
-    .join("-")
     .toLowerCase()
-    .replace(/[^a-zA-Z0-9-]/g, "");
+    .trim()
+    .replace(/[^\w\s-]/g, "") // Remove special chars
+    .replace(/[\s_-]+/g, "-") // Replace spaces/underscores/multiple dashes with single dash
+    .replace(/^-+|-+$/g, ""); // Trim dashes from start/end
 
   const newPost = new Post({
     ...req.body,
@@ -61,22 +68,25 @@ export const getPosts = async (req, res, next) => {
   try {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9;
-    const sortDirection = req.query.order === "asc" ? 1 : -1;
+    const sortDirection = req.query.sort === "asc" ? 1 : -1;
+
     const posts = await Post.find({
       ...(req.query.userId && { userId: req.query.userId }),
       ...(req.query.category && { category: req.query.category }),
       ...(req.query.slug && { slug: req.query.slug }),
       ...(req.query.postId && { _id: req.query.postId }),
-      ...(req.query.searchTerm && {
+      ...(req.query.keyword && {
         $or: [
-          { title: { $regex: req.query.searchTerm, $options: "i" } },
-          { content: { $regex: req.query.searchTerm, $options: "i" } },
+          { title: { $regex: req.query.keyword, $options: "i" } },
+          { content: { $regex: req.query.keyword, $options: "i" } },
         ],
       }),
     })
       .sort({ updatedAt: sortDirection })
       .skip(startIndex)
       .limit(limit);
+
+    // console.log("posts found :", posts);
 
     const totalPosts = await Post.countDocuments();
 
@@ -126,7 +136,7 @@ export const updatePost = async (req, res, next) => {
 // Delete
 export const deletePost = async (req, res, next) => {
   console.log("req in deletePost", req);
-  if (!req.user.isAdmin && !req.user.id == req.params.userId) {
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
     return next(createError(403, "You are not allowed to delete a post"));
   }
 

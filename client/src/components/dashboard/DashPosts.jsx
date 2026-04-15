@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -24,6 +23,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Trash2Icon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import api from '@/api/axiosInstance';
 
 export default function DashPosts() {
 	const { currentUser } = useSelector((state) => state.user);
@@ -33,7 +33,7 @@ export default function DashPosts() {
 	useEffect(() => {
 		async function fetchPosts() {
 			try {
-				const res = await axios.get(`/api/post/getposts?id=${currentUser._id}`);
+				const res = await api.get(`/post/getposts?id=${currentUser._id}`);
 				setPosts(res.data.posts);
 				if (res.data.posts.length < 9) {
 					setShowMore(false);
@@ -50,9 +50,7 @@ export default function DashPosts() {
 	// Show more posts
 	async function handleShowMore() {
 		const startIndex = posts.length;
-		const res = await axios.get(
-			`/api/post/getposts?id=${currentUser._id}&startIndex=${startIndex}`,
-		);
+		const res = await api.get(`/post/getposts?id=${currentUser._id}&startIndex=${startIndex}`);
 		setPosts((prev) => [...prev, ...res.data.posts]);
 		if (res.data.posts.length < 9) {
 			setShowMore(false);
@@ -61,7 +59,7 @@ export default function DashPosts() {
 
 	// Delete post
 	async function handleDelete(postId) {
-		const deletePromise = axios.delete(`/api/post/deletepost/${postId}/${currentUser._id}`);
+		const deletePromise = api.delete(`/post/deletepost/${postId}/${currentUser._id}`);
 
 		toast.promise(deletePromise, {
 			loading: 'Deleting post...',
