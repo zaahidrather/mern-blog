@@ -92,7 +92,7 @@ export default function UpdatePost() {
 			console.log('uploading image');
 			// 3. Upload directly to Cloudinary
 			const res = await axios.post(
-				`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+				`https://api.cloudinary.com/v1_1/${cloudName}/image/upload/f_auto,q_auto`,
 				imageUploadData,
 				{
 					onUploadProgress: (progressEvent) => {

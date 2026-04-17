@@ -28,11 +28,18 @@ export default defineConfig({
 	build: {
 		rollupOptions: {
 			output: {
-				manualChunks: {
-					// Group the editor and its heavy dependencies together
-					'editor-vendor': ['react-quill-new', 'quill', 'lodash-es', 'quill-delta'],
-					// Group firebase auth separately
-					'firebase-vendor': ['firebase/auth', 'firebase/app'],
+				manualChunks(id) {
+					// 1. Keep your existing manual chunks logic
+					if (id.includes('firebase')) return 'firebase-vendor';
+					if (id.includes('quill') || id.includes('lodash-es')) return 'editor-vendor';
+
+					// 2. Split core UI and React engine
+					// This pulls the heavy lifting out of index.js
+					if (id.includes('node_modules')) {
+						if (id.includes('react') || id.includes('radix-ui') || id.includes('lucide-react')) {
+							return 'vendor-core';
+						}
+					}
 				},
 			},
 		},

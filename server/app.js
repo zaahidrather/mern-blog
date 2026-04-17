@@ -6,8 +6,8 @@ import postRoutes from "./routes/post.route.js";
 import commmentRoutes from "./routes/comment.route.js";
 import path from "path";
 
-const app = express();
 const __dirname = path.resolve(); // Path of file in which the script for starting server ran
+const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
@@ -18,7 +18,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commmentRoutes);
 
-app.get("*", (req, res) => {
+app.get("/{*path}", (req, res) => {
   res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
 });
 
