@@ -29,7 +29,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Trash2Icon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import api from '@/api/axiosInstance';
 
 export default function Profile() {
@@ -105,7 +104,7 @@ export default function Profile() {
 			dispatch(updateProfileStart());
 
 			// 4. Axios Request
-			const res = await api.patch(`/user/update/${currentUser._id}`, dataToSend);
+			const res = await api.patch(`/user/update/${currentUser._id}`, dataToSend, {});
 
 			// 5. Success Handling
 			dispatch(updateProfileSuccess(res.data));
@@ -121,22 +120,6 @@ export default function Profile() {
 		}
 	}
 
-	// async function handleDelete() {
-	// 	try {
-	// 		dispatch(deleteUserStart());
-	// 		const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-	// 			method: 'DELETE',
-	// 		});
-	// 		if (res.ok) {
-	// 			dispatch(deleteUserSuccess());
-	// 		} else {
-	// 			// dispatch(deleteUserFailure(res));
-	// 			console.log('failed to delete');
-	// 		}
-	// 	} catch (error) {
-	// 		dispatch(deleteUserFailure(error.message));
-	// 	}
-	// }
 	async function handleDelete() {
 		try {
 			dispatch(deleteUserStart());
